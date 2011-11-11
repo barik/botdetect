@@ -1,0 +1,43 @@
+1. Project Summary.  Please make sure to include the purpose and rationale for your study as well as a brief overview of your study.
+
+The manufacturers of online games have a strong incentive to minimize the use of bots (fully automatic computer programs) in their games because of their negative effects. Such effects can include diminishing game play experience for actual players, for example, by using resources and locking activities that would otherwise be available to human player, to more global effects that can destabilize in game virtual currencies.
+
+The two existing approaches to bot detection are broadly classified as active and passive. Active mechanisms use means that directly interrupt the game experience of the player, either by asking them to solve a puzzle, or verify that they are human. Passive mechanisms look at underlying player behavior to determine whether or not the player is a bot, but all current approaches assume that bots have a play style that is easily distinguishable from that of humans, and thereby easily detectable. Current literature concedes that their bot detection schemes could be evaded through the use of mimicking attacks, that is, bots that behave like humans, but the current attitude is that such behavior is difficult to implement.
+
+Our hypothesis is that it is indeed possible to create bots that can mimick human behavior, particularly with respect to human observational proofs (HOPs) that rely on user interaction through timing and location. The successful characterization of such an agent would require bot detection designs to reexamine their current attitudes towards HOPs.
+
+To accomplish this task, we will first design a game in the genre of social games that is a variant of the popular online game Words with Friends (this game is essentially like Scrabble). This game would provide an interface by which the investigators would record in-game mouse locations, clicks, and other actions which would then be used to characterize the distribution of player actions. Using this knowledge of actual player behavior, we would then create a bot to mimick these actions against current HOPs. If successful, our bot would be able to disguise itself as a human player.
+
+2. Description of participant population, including age range, inclusion/exclusion criteria, and any vulnerable populations that will be targeted for enrollment.
+
+Our participant population will consist of any consenting adult who is willing to play our online game. The game will be accessible by a public link, which can be accessed by anyone at anytime.
+
+3. Description of how potential participants will be approached about the research and how informed consent will be obtained.  Alternatively, provide an explanation of why informed consent will not be obtained. Include a copy of recruitment materials, such as, scripts, letters of introduction, emails, etc. with your submission.
+
+Potential participants will be recruited by posting messages on Internet forums that are related to games, technology, or other computer-related fields that would benefit from the results of our study. The game itself will be posted to various game sites, and players who interested in the game can simply access it online. 
+
+4. Description of how identifying information will be recorded and associated with data (e.g. code numbers used that are linked via a master list to subjects’ names).  Alternatively, provide details on how study data will be collected and stored anonymously (“anonymously” means that there is no link whatsoever between participant identities and data).  Describe management of data: security, storage, access, and final disposition.
+
+When each instance of the game is started, the game will assign a random session for the duration of the game. During this time, the system will capture in-game events, such as mouse clicks, mouse movement, button presses, and menu or item selections. The system will not capture any information that occurs outside of the game environment. The data will be transmitted and stored in a MySQL database at NCSU. Time stamps will be kept in EDT/EST, regardless of the local time of the participant. Thus, at no time is any information about the participant themselves collected. In fact, they may even elect play the game multiple times and they will be treated as a different session every time they play.
+
+5.	Provide a detailed (step-by-step) description of all study procedures, including descriptions of what the participants will experience. Include topics, materials, procedures, for use of assessments (interviews, surveys, questionnaires, testing methods, observations, etc.).   
+
+Step 1, Participant selection. Participant will decide to play the game clicking on a link for a message that is posted to game-related or technology-related forums. These postings may also include social network sites, such as Facebook or Twitter.
+
+Step 2, Consent. Should the player click the link, they will be presented with a game. At the start of the game, the player will be shown a dialog box indicating that we will be anonymously collecting data about their game play to improve game design. They may either agree or disagree with this option. If they disagree, they will still be able to play the game, but no data will be collected.
+
+Step 3, Game. The participant will play the game, during which the system will record their in-game actions. The participant may play the game for any duration. They may also return to play a new game at a later time. Each time a participant plays the game, they are given a different session identifier. The participant will always be playing against a computer opponent of our design.
+
+Example of Internet posting:
+
+Hello!
+
+Help participate in research by spending a few minutes or more playing a variation of a popular online game (Words with Friends). Playing our game will help us improve the design of games in many areas, including usability and interaction, artificial intelligence, as well as cognitive modeling.
+
+The game is completely free to play, and no personally identifiable information will be collected. In addition, no events or actions that occur outside of the Flash game environment will be recorded.
+
+If you have any questions about the study, please feel free to contact the author, Titus Barik (tbarik@ncsu.edu).
+
+Thanks!
+
+Titus
