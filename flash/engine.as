@@ -1105,7 +1105,7 @@
 										}
 										if (boardTileArray[startY][startX - front] != "em")
 										{
-											if(boardTileArray[startY-1][startX-front] == "lo" || boardTileArray[startY+1][startX-front] == "lo")
+											if((startY > 0 && boardTileArray[startY-1][startX-front] == "lo") || (startY < 14 && boardTileArray[startY+1][startX-front] == "lo"))
 											{
 												foundLock = 1;
 												break;
@@ -1122,7 +1122,7 @@
 										}
 										if (boardTileArray[startY][startX + back] != "em")
 										{
-											if(boardTileArray[startY-1][startX+back] =="lo" || boardTileArray[startY+1][startX+back] =="lo")
+											if((startY > 0 && boardTileArray[startY-1][startX+back] =="lo") || (startY < 14 && boardTileArray[startY+1][startX+back] =="lo"))
 											{
 												foundLock = 1;
 												break;
@@ -1218,7 +1218,7 @@
 														var subBack:int = 1;
 														var subWord:Array = [];
 														subWord.push(boardTileArray[startY][i]);
-														while ((boardTileArray[startY-subFront][i] != "em" || startY-subFront != 0) || (boardTileArray[startY+subBack][i] != "em" || startY+subBack != 14))
+														while ((boardTileArray[startY-subFront][i] != "em" && startY-subFront != 0) || (boardTileArray[startY+subBack][i] != "em" && startY+subBack != 14))
 														{
 															if (startY - subFront >= 0 && boardTileArray[startY - subFront][i] == "lo")
 															{
@@ -1236,7 +1236,7 @@
 														{
 															trace("Some words were not found");
 															adjacentWords = 0;
-															infoBox.text = "The word "+subWord+" was not found. Please place another word and try again. Click anywhere to continue.";
+															infoBox.text = "The word "+subWord.join("")+" was not found. Please place another word and try again. Click anywhere to continue.";
 															readingText = 1;
 															addChild(infoBox);
 														}
@@ -1435,7 +1435,7 @@
 										}
 										if (boardTileArray[startY-front][startX] != "em")
 										{
-											if(boardTileArray[startY-front][startX-1] == "lo" || boardTileArray[startY-front][startX+1] == "lo")
+											if((startX > 0 && boardTileArray[startY-front][startX-1] == "lo") || (startX < 14 && boardTileArray[startY-front][startX+1] == "lo"))
 											{
 												foundLock = 1;
 												break;
@@ -1453,7 +1453,7 @@
 									
 										if (boardTileArray[startY+back][startX] != "em")
 										{
-											if(boardTileArray[startY+back][startX-1] == "lo" || boardTileArray[startY+back][startX+1] == "lo")
+											if((startX > 0 && boardTileArray[startY+back][startX-1] == "lo") || (startX < 14 && boardTileArray[startY+back][startX+1] == "lo"))
 											{
 												foundLock = 1;
 												break;
@@ -1543,14 +1543,14 @@
 													subBack = 1;
 													subWord = [];
 													subWord.push(boardTileArray[i][startX]);
-													while(boardTileArray[i][startX-subFront] != "em" || boardTileArray[i][startX+subBack] != "em")
+													while((boardTileArray[i][startX-subFront] != "em" && startX-subFront != 0) || (startX+subBack != 14 && boardTileArray[i][startX+subBack] != "em"))
 													{
-														if(boardTileArray[i][startX-subFront] == "lo")
+														if(startX - subFront >= 0 && boardTileArray[i][startX-subFront] == "lo")
 														{
 															subWord.unshift(boardArray[i][startX-subFront].stringData);
 															subFront++;
 														}
-														if(boardTileArray[i][startX+subBack] == "lo")
+														if(startX + subBack <= 14 && boardTileArray[i][startX+subBack] == "lo")
 														{
 															subWord.push(boardArray[i][startX+subBack].stringData);
 															subBack++;
@@ -1614,8 +1614,10 @@
 															scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
 															tripleWord++;
 														}
+														
 														while (boardTileArray[i][startX-subFront] != "em" || boardTileArray[i][startX+subBack] != "em")
 														{
+															trace(boardTileArray[i][startX-subFront],  boardTileArray[i][startX+subBack]);
 															if (startY - subFront >= 0 && boardTileArray[i][startX - subFront] == "lo")
 															{
 																scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
