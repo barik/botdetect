@@ -4,12 +4,18 @@
 		[Embed(source="f-16.txt",mimeType="application/octet-stream")]
 		private static const ScrabbleFile:Class;
 		private static var words:Array = new ScrabbleFile().toString().split("\n");
-		public function ScrabbleDictionary() {
+		public function ScrabbleDictionary() 
+		{
+			
 		}
-		public function contains(word:String):Boolean {
+		
+
+		public function contains(word:String):Boolean 
+		{
 			return words.indexOf(word.toLowerCase()) > -1;
 		}
-		public function random():String {
+		public function random():String 
+		{
 			var found:int = 0;
 			var tempString:String = "";
 			while(found == 0)
