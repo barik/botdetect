@@ -24,6 +24,7 @@ function isValidUser($id, $nonce) {
 	$stmt->fetch();
 	if ($c == 0) {
 		echo "result=user_fail";		
+		return false;
 	}
 	else {
 		return true;
