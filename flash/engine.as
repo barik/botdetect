@@ -664,7 +664,7 @@
 					swapEnter.x = 68;
 					swapEnter.y = (35*15)-49 + offset;
 					addChild(swapEnter);
-					var swapCancel:button = new button("pass");
+					var swapCancel:button = new button("cancel");
 					swapCancel.x = 408;
 					swapCancel.y = (35*15)-49 + offset;
 					addChild(swapCancel);
@@ -683,6 +683,21 @@
 				else if(pressedPass == 1 && mouseY>= 35*15+8 + offset && mouseY <= 35*15+48 + offset && mouseX >= 466 && mouseX <= 516)
 				{
 					turn++;
+					variables = new URLVariables();
+					variables.debug = true;
+					variables.id = idArray[0];
+					variables.nonce = idArray[1];
+					variables.action = "submit";
+					variables["data[]"] = dataArray;
+					var request:URLRequest = new URLRequest(WWF_URL);
+					request.data = variables;
+					request.method = URLRequestMethod.POST;
+							
+					var loader:URLLoader = new URLLoader();
+					loader.addEventListener(Event.COMPLETE, completeHandler);
+						
+					loader.load(request);	
+					dataArray = [];
 					//First, check to see if there are any stray tiles on the board. If so, get rid of those guys. 
 					for(i = 0; i < 15; i++)
 					{
