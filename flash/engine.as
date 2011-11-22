@@ -233,14 +233,17 @@
 			passButton.y = 35*15+6 + offset;
 			addChild(passButton);
 			infoBox = new TextField();
+			infoFormat = new TextFormat();
+			infoFormat.size = 16;
 			infoBox.height = 50;
 			infoBox.width = 300;
 			infoBox.x = 112.5;
 			infoBox.y = 295;
+			infoBox.defaultTextFormat = infoFormat;
 			infoBox.background = true;
 			infoBox.wordWrap = true;
 			infoBox.autoSize = "left";
-			infoBox.text = "Thank you for choosing to play Words with Fiends! The rules to this game are the same as the rules for Scrabble. Earn points by placing tiles on the board to make words. You will be going first. To begin, place a word through the star tile in the middle of the board. Remember that your words must use at least one letter from a word that already exists on the board. The game will end when either you or the computer gets to 225 points. Click anywhere to begin!";
+			infoBox.text = "Thank you for choosing to play Scrabblesque! The rules to this game are the same as the rules for Scrabble. Earn points by placing tiles on the board to make words. You will be going first. To begin, place a word through the star tile in the middle of the board. Remember that your words must use at least one letter from a word that already exists on the board. The game will end when either you or the computer gets to 150 points. Click anywhere to begin!";
 			addChild(infoBox);
 			addEventListener(Event.ENTER_FRAME, onFrameEnter);
 			addEventListener(MouseEvent.MOUSE_DOWN, onClick);
@@ -692,7 +695,7 @@
 					var request:URLRequest = new URLRequest(WWF_URL);
 					request.data = variables;
 					request.method = URLRequestMethod.POST;
-							
+					
 					var loader:URLLoader = new URLLoader();
 					loader.addEventListener(Event.COMPLETE, completeHandler);
 						
@@ -711,8 +714,9 @@
 									{
 										currentTiles[k].stringData = boardArray[i][j].stringData;
 										currentTiles[k].gotoAndStop(currentTiles[k].stringData);
-										boardArray[i][j].stringData = boardTileArray[i][j];
+										boardArray[i][j].stringData = boardSymbolArray[i][j];
 										boardArray[i][j].gotoAndStop(boardArray[i][j].stringData);
+										break;
 									}
 								}
 							}
@@ -1047,25 +1051,46 @@
 						}
 						else
 						{
-							if ((startX != 14 && boardTileArray[startY][startX + 1] != "em") || (startX != 0 && boardTileArray[startY][startX - 1] != "em"))
+							var horizontalCount:int = 0;
+							var verticalCount:int = 0;
+							//Check vertically
+							for(i = 0; i < 15; i++)
 							{
-								dir = "horizontal";
+								if(boardTileArray[i][startX] != "em" && boardTileArray[i][startX] != "lo")
+								{
+									verticalCount++;
+								}
+								if(boardTileArray[startY][i] != "em" && boardTileArray[startY][i] != "lo")
+								{
+									horizontalCount++;
+								}
 							}
-							else if ((startY != 14 && boardTileArray[startY+1][startX] != "em") || (startY != 0 && boardTileArray[startY-1][startX] != "em"))
+							trace(horizontalCount, verticalCount);
+							if(verticalCount == 1 && horizontalCount == 1)
+							{
+								if(boardTileArray[startY-1][startX] != "em" || boardTileArray[startY+1][startX] != "em")
+								{
+									dir = "vertical";
+								}
+								else
+								{
+									dir = "horizontal";
+								}
+							}
+							else if(verticalCount > horizontalCount)
 							{
 								dir = "vertical";
 							}
 							else
 							{
-								trace("Invalid configuration!");
-								infoBox.text = "Invalid board configuration. Click anywhere to continue.";
-								addChild(infoBox);
-								readingText = 1;
+								dir = "horizontal";
 							}
+							
+		
 							trace(dir);
 							//Make sure it goes through at least 1 locked square
-							var front:int = 1;
-							var back:int = 1;
+							var front:int = 0;
+							var back:int = 0;
 							var foundLock:int = 0;
 							if (dir == "horizontal")
 							{
@@ -1080,6 +1105,11 @@
 										}
 										if (boardTileArray[startY][startX - front] != "em")
 										{
+											if(boardTileArray[startY-1][startX-front] == "lo" || boardTileArray[startY+1][startX-front] == "lo")
+											{
+												foundLock = 1;
+												break;
+											}
 											front++;
 										}
 									}
@@ -1092,6 +1122,11 @@
 										}
 										if (boardTileArray[startY][startX + back] != "em")
 										{
+											if(boardTileArray[startY-1][startX+back] =="lo" || boardTileArray[startY+1][startX+back] =="lo")
+											{
+												foundLock = 1;
+												break;
+											}
 											back++;
 										}
 									}
@@ -1183,7 +1218,7 @@
 														var subBack:int = 1;
 														var subWord:Array = [];
 														subWord.push(boardTileArray[startY][i]);
-														while (boardTileArray[startY-subFront][i] != "em" || boardTileArray[startY+subBack][i] != "em")
+														while ((boardTileArray[startY-subFront][i] != "em" || startY-subFront != 0) || (boardTileArray[startY+subBack][i] != "em" || startY+subBack != 14))
 														{
 															if (startY - subFront >= 0 && boardTileArray[startY - subFront][i] == "lo")
 															{
@@ -1230,32 +1265,32 @@
 															subBack = 1;
 															if(boardSymbolArray[startY][i] == "dl")
 															{
-																scoreChange = scoreChange + scoreDict[boardTileArray[startY][i].stringData]*2;
+																scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData]*2;
 															}
 															else if(boardSymbolArray[startY][i] == "tl")
 															{
-																scoreChange = scoreChange + scoreDict[boardTileArray[startY][i].stringdata]*3;
+																scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringdata]*3;
 															}
 															else if(boardSymbolArray[startY][i] == "dw")
 															{
-																scoreChange = scoreChange + scoreDict[boardTileArray[startY][i].stringData];
+																scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
 																doubleWord++;
 															}
 															else if(boardSymbolArray[startY][i] == "tw")
 															{
-																scoreChange = scoreChange + scoreDict[boardTileArray[startY][i].stringData];
+																scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
 																tripleWord++;
 															}
 															while (boardTileArray[startY-subFront][i] != "em" || boardTileArray[startY+subBack][i] != "em")
 															{
 																if (startY - subFront >= 0 && boardTileArray[startY - subFront][i] == "lo")
 																{
-																	scoreChange = scoreChange + scoreDict[boardTileArray[startY][i].stringData];
+																	scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
 																	subFront++;
 																}
 																if (startY + subBack <= 14 && boardTileArray[startY + subBack][i] == "lo")
 																{
-																	scoreChange = scoreChange + scoreDict[boardTileArray[startY][i].stringData];
+																	scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
 																	subBack++;
 																}
 															}
@@ -1333,7 +1368,7 @@
 												}
 												
 												scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
-												if(playerScore >= 225)
+												if(playerScore >= 150)
 												{
 													gameMode = 3;
 													infoBox.text = "You Won!!! Thank you for playing. Click anywhere to play again";
@@ -1400,6 +1435,11 @@
 										}
 										if (boardTileArray[startY-front][startX] != "em")
 										{
+											if(boardTileArray[startY-front][startX-1] == "lo" || boardTileArray[startY-front][startX+1] == "lo")
+											{
+												foundLock = 1;
+												break;
+											}
 											front++;
 										}
 									}
@@ -1413,6 +1453,11 @@
 									
 										if (boardTileArray[startY+back][startX] != "em")
 										{
+											if(boardTileArray[startY+back][startX-1] == "lo" || boardTileArray[startY+back][startX+1] == "lo")
+											{
+												foundLock = 1;
+												break;
+											}
 											back++;
 										}
 									}
@@ -1515,13 +1560,20 @@
 													{
 														trace("Some words were not found");
 														adjacentWords = 0;
-														infoBox.text = "The word "+subWord+" was not found. Please place another word and try again. Click anywhere to continue.";
+														infoBox.text = "The word "+subWord.join("")+" was not found. Please place another word and try again. Click anywhere to continue.";
 														readingText = 1;
 														addChild(infoBox);
 														break;
 													}
 												}
 											}
+										}
+										else
+										{
+											adjacentWords = 0;
+											infoBox.text = "The word "+word+" was not found. Please place another word and try again. Click anywhere to continue.";
+											readingText = 1;
+											addChild(infoBox);
 										}
 										if(adjacentWords != 1)
 										{
@@ -1531,6 +1583,65 @@
 										{
 											trace("GOOD TO GO, LOCK IN AND ROLL OUT");
 											turn++;
+											
+											//Check adjacent words FIRST
+											for(i = front; i < back; i++)
+											{
+												scoreChange = 0;
+												doubleWord = 0;
+												tripleWord  = 0; 
+												if(boardTileArray[i][startX] != "lo")
+												{
+													if ((startX < 14 && boardTileArray[i][startX+1] != "em") || (startY > 0 && boardTileArray[i][startX-1] != "em"))
+													{
+														subFront = 1;
+														subBack = 1;
+														if(boardSymbolArray[i][startX] == "dl")
+														{
+															scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData]*2;
+														}
+														else if(boardSymbolArray[i][startX] == "tl")
+														{
+															scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringdata]*3;
+														}
+														else if(boardSymbolArray[i][startX] == "dw")
+														{
+															scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
+															doubleWord++;
+														}
+														else if(boardSymbolArray[i][startX] == "tw")
+														{
+															scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
+															tripleWord++;
+														}
+														while (boardTileArray[i][startX-subFront] != "em" || boardTileArray[i][startX+subBack] != "em")
+														{
+															if (startY - subFront >= 0 && boardTileArray[i][startX - subFront] == "lo")
+															{
+																scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
+																subFront++;
+															}
+															if (startY + subBack <= 14 && boardTileArray[i][startX+subBack] == "lo")
+															{
+																scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
+																subBack++;
+															}
+														}
+														if(doubleWord != 0)
+														{
+															playerScore = playerScore + scoreChange*(2*doubleWord);
+														}
+														else if (tripleWord != 0)
+														{
+															playerScore = playerScore + scoreChange*(3*tripleWord);
+														}
+														else
+														{
+															playerScore = playerScore + scoreChange;
+														}
+													}
+												}
+											}
 											scoreChange = 0;
 											doubleWord = 0;
 											tripleWord = 0; 
@@ -1579,7 +1690,7 @@
 											
 											
 											
-											//Calculate score change due to adjacent words
+											//Give the player new letters
 											for (i = 0; i < currentTiles.length; i++)
 											{
 												if (currentTiles[i].stringData == "empty")
@@ -1592,7 +1703,7 @@
 											}
 											
 											scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
-											if(playerScore >= 225)
+											if(playerScore >= 150)
 											{
 												gameMode = 3;
 												infoBox.text = "You Won!!! Thank you for playing. Click anywhere to play again";
@@ -1937,6 +2048,7 @@
 					{
 						boardArray[i][j].stringData = boardTileArray[i][j];
 						boardArray[i][j].gotoAndStop(boardSymbolArray[i][j]);
+						boardArray[i][j].valLock = 0;
 					}
 				}
 				playerScore = 0;
@@ -2229,7 +2341,7 @@
 										trace("Computer Score: "+computerScore);
 										scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
 										totalSuccess = 1;
-										if(computerScore >= 225)
+										if(computerScore >= 150)
 										{
 											gameMode = 3;
 											infoBox.text = "The Computer won! Better luck next time. Click anywhere to play again!";
@@ -2380,7 +2492,7 @@
 										trace("Computer Score: "+computerScore);
 										scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
 										totalSuccess = 1;
-										if(computerScore >= 225)
+										if(computerScore >= 150)
 										{
 											gameMode = 3;
 											infoBox.text = "The Computer won! Better luck next time. Click anywhere to play again!";
