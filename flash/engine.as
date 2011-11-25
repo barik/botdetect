@@ -19,7 +19,7 @@
 		public var holdingTile:int = 0;
 		public var newLetter:letters;
 		
-		public var offset:int = 40;
+		public static const OFFSET:int = 40;
 		
 		public var startIndex:int = -1;
 		public var startTopBottom:int = -1;
@@ -168,7 +168,7 @@
 			scoreFormat = new TextFormat();
 			scoreFormat.size = 30;
 			scoreBox = new TextField();
-			scoreBox.height = offset;
+			scoreBox.height = OFFSET;
 			scoreBox.width = 525;
 			scoreBox.defaultTextFormat = scoreFormat;
 			scoreBox.text = "Player: 0				Computer: 0";
@@ -191,14 +191,14 @@
 				for (j = 0; j < 15; j++)
 				{
 					boardArray[i][j].x = j * 35;
-					boardArray[i][j].y = i * 35 + offset;
+					boardArray[i][j].y = i * 35 + OFFSET;
 					addChild(boardArray[i][j]);
 					boardArray[i][j].gotoAndStop(boardSymbolArray[i][j]);
 				}
 			}
 
 			var tileFrame = new tileHolderFrame();
-			tileFrame.y = 35 * 15 + offset;
+			tileFrame.y = 35 * 15 + OFFSET;
 			tileFrame.x = 0;
 			addChild(tileFrame);
 
@@ -209,7 +209,7 @@
 				alphabetArray.splice(randNum,1);
 				currentTiles.push(holdTile);
 				currentTiles[i].x = 38 * i + 130;
-				currentTiles[i].y = 35 * 15 + 8 + offset;
+				currentTiles[i].y = 35 * 15 + 8 + OFFSET;
 				addChild(currentTiles[i]);
 				currentTiles[i].gotoAndStop(currentTiles[i].stringData);
 				var holdSwapTile:holderTile;
@@ -218,19 +218,19 @@
 
 			var enterButton:button = new button("more");
 			enterButton.x = 10;
-			enterButton.y = 35 * 15 + 6 + offset;
+			enterButton.y = 35 * 15 + 6 + OFFSET;
 			addChild(enterButton);
 			var shuffleButton:button = new button("shuffle");
 			shuffleButton.x = 68;
-			shuffleButton.y = 35*15+6 + offset;
+			shuffleButton.y = 35*15+6 + OFFSET;
 			addChild(shuffleButton);
 			var swapButton:button = new button("swap");
 			swapButton.x = 408;
-			swapButton.y = 35*15+6 + offset;
+			swapButton.y = 35*15+6 + OFFSET;
 			addChild(swapButton);
 			var passButton:button = new button("pass");
 			passButton.x = 466;
-			passButton.y = 35*15+6 + offset;
+			passButton.y = 35*15+6 + OFFSET;
 			addChild(passButton);
 			infoBox = new TextField();
 			infoFormat = new TextFormat();
@@ -273,7 +273,7 @@
 			dataArray.push("Mouse_Click,"+mouseX+","+mouseY+","+getTimer());
 			if(swappingTiles != 1 && gameMode == 1 && readingText == 0)
 			{
-				if (mouseY >= 35*15+8 + offset && mouseY <= 35*15+48 + offset)
+				if (mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET)
 				{
 					var index:int = -1;
 					if (mouseX >=10 && mouseX <=60)
@@ -326,7 +326,7 @@
 						startIndex = index;
 					}
 				}
-				else if (mouseY <= 35*15 + offset)
+				else if (mouseY <= 35*15 + OFFSET)
 				{
 					var xIndex:int = -1;
 					var yIndex:int = -1;
@@ -336,7 +336,7 @@
 						{
 							xIndex = i;
 						}
-						if (mouseY >= 35*i + offset && mouseY <= 35*(i+1) + offset)
+						if (mouseY >= 35*i + OFFSET && mouseY <= 35*(i+1) + OFFSET)
 						{
 							yIndex = i;
 						}
@@ -364,23 +364,23 @@
 				}
 
 			}
-			else if(gameMode == 1 && readingText == 0 && swappingTiles == 1 && mouseY >=(35*15)-49 + offset && mouseY <= 35*15+48 + offset)
+			else if(gameMode == 1 && readingText == 0 && swappingTiles == 1 && mouseY >=(35*15)-49 + OFFSET && mouseY <= 35*15+48 + OFFSET)
 			{
 				//We'll do pressing the cancel on the swap thing for now
-				if(mouseY <= (35*15)-9 + offset && mouseX >= 408 && mouseX <= 458)
+				if(mouseY <= (35*15)-9 + OFFSET && mouseX >= 408 && mouseX <= 458)
 				{
 					pressedSwapCancel = 1;
 					removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
 					addEventListener(MouseEvent.MOUSE_UP, onUnclick);
 				}
-				else if(mouseY <= (35*15)-9 + offset && mouseX >= 68 && mouseX <= 117)
+				else if(mouseY <= (35*15)-9 + OFFSET && mouseX >= 68 && mouseX <= 117)
 				{
 					trace("Pressing enter");
 					pressedSwapEnter = 1;
 					removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
 					addEventListener(MouseEvent.MOUSE_UP, onUnclick);
 				}
-				else if(mouseY >= 35*15+8 + offset && mouseY <= 35*15+48 + offset)
+				else if(mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET)
 				{
 					index = -1;
 					//Time to pick up some bottom tiles!
@@ -409,7 +409,7 @@
 						startTopBottom = 1;
 					}
 				}
-				else if(mouseY >= (35*15)-46 + offset && mouseY <= 35*15 - 9 + offset)
+				else if(mouseY >= (35*15)-46 + OFFSET && mouseY <= 35*15 - 9 + OFFSET)
 				{
 					index = -1;
 					for(i = 0; i < 7; i++)
@@ -457,7 +457,7 @@
 
 					}
 				}
-				if (newLetter != null && mouseY >= 35*15+1 + offset && mouseY <= 35*15+48 + offset)
+				if (newLetter != null && mouseY >= 35*15+1 + OFFSET && mouseY <= 35*15+48 + OFFSET)
 				{
 					var index:int = -1;
 					for (i = 0; i < 7; i++)
@@ -528,7 +528,7 @@
 						newLetter = null;
 					}
 				}
-				else if (mouseY <= 35*15 + offset && mouseY > offset)
+				else if (mouseY <= 35*15 + OFFSET && mouseY > OFFSET)
 				{
 					//Dropping tiles on the board
 					
@@ -540,7 +540,7 @@
 						{
 							xIndex = i;
 						}
-						if (mouseY >= 35*i + offset && mouseY <= 35*(i+1) + offset)
+						if (mouseY >= 35*i + OFFSET && mouseY <= 35*(i+1) + OFFSET)
 						{
 							yIndex = i;
 						}	
@@ -599,7 +599,7 @@
 					}
 				}
 
-				else if (mouseY > 35*15+48 + offset)
+				else if (mouseY > 35*15+48 + OFFSET)
 				{
 					//Error Moves
 					if (startIndex != -1)
@@ -616,7 +616,7 @@
 					}
 				}
 				
-				else if (newLetter != null && mouseY <= offset)
+				else if (newLetter != null && mouseY <= OFFSET)
 				{
 					//Error moves
 					if(startIndex != -1)
@@ -634,7 +634,7 @@
 					newLetter = null;
 				}
 				
-				else if (pressedShuffle == 1 && mouseY >=35*15+8 + offset && mouseY <= 35*15+48 + offset && mouseX >= 68 && mouseX <=117)
+				else if (pressedShuffle == 1 && mouseY >=35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >= 68 && mouseX <=117)
 				{
 					//Shuffle your letters
 					var permutationArray:Array = [];
@@ -655,35 +655,35 @@
 					
 					dataArray.push("New_Rack,"+currentTiles[0].stringData+","+currentTiles[1].stringData+","+currentTiles[2].stringData+","+currentTiles[3].stringData+","+currentTiles[4].stringData+","+currentTiles[5].stringData+","+currentTiles[6].stringData+","+getTimer());
 				}
-				else if (pressedSwap == 1 && mouseY >= 35*15+8 + offset && mouseY <= 35*15+48 + offset && mouseX >= 408 && mouseX <= 458)
+				else if (pressedSwap == 1 && mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >= 408 && mouseX <= 458)
 				{
 					//load up our swap thing and probably set a swapping tiles flag that will negate a LOT of things
 					var swapBar:swapFrame = new swapFrame();
 					swapBar.x = 64
-					swapBar.y = (35*15)-55 + offset;
+					swapBar.y = (35*15)-55 + OFFSET;
 					addChild(swapBar);
 					//Create some buttons
 					var swapEnter:button = new button("more");
 					swapEnter.x = 68;
-					swapEnter.y = (35*15)-49 + offset;
+					swapEnter.y = (35*15)-49 + OFFSET;
 					addChild(swapEnter);
 					var swapCancel:button = new button("cancel");
 					swapCancel.x = 408;
-					swapCancel.y = (35*15)-49 + offset;
+					swapCancel.y = (35*15)-49 + OFFSET;
 					addChild(swapCancel);
 					swappingTiles = 1;
 					
 					for(i = 0; i < 7; i++)
 					{
 						currentSwapTiles[i] = new holderTile("empty");
-						currentSwapTiles[i].y = (35*15)-55 + 8 + offset;
+						currentSwapTiles[i].y = (35*15)-55 + 8 + OFFSET;
 						currentSwapTiles[i].x = 38 * i + 130;
 						addChild(currentSwapTiles[i]);
 						currentSwapTiles[i].gotoAndStop(currentSwapTiles[i].stringData);
 					}
 					trace("Entering Swap Tiles Mode");
 				}
-				else if(pressedPass == 1 && mouseY>= 35*15+8 + offset && mouseY <= 35*15+48 + offset && mouseX >= 466 && mouseX <= 516)
+				else if(pressedPass == 1 && mouseY>= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >= 466 && mouseX <= 516)
 				{
 					turn++;
 					variables = new URLVariables();
@@ -788,7 +788,7 @@
 						computerGo();
 					}
 				}
-				else if (pressedEnter == 1 && mouseY >= 35*15+8 + offset && mouseY <= 35*15+48 + offset && mouseX >=10 && mouseX <=60)
+				else if (pressedEnter == 1 && mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >=10 && mouseX <=60)
 				{
 					
 					//Submit Log Data
@@ -1760,7 +1760,7 @@
 			
 			else if(swappingTiles == 1 && gameMode == 1 && readingText == 0)
 			{
-				if(pressedSwapCancel == 1 && mouseY <= (35*15)-9 + offset && mouseX >= 408 && mouseX <= 458 && mouseY >=(35*15)-49 + offset)
+				if(pressedSwapCancel == 1 && mouseY <= (35*15)-9 + OFFSET && mouseX >= 408 && mouseX <= 458 && mouseY >=(35*15)-49 + OFFSET)
 				{
 					trace("Cancelling Swap");
 					//Check to see if anything is the the swap tileset
@@ -1813,7 +1813,7 @@
 					swappingTiles = 0;
 				}
 				
-				else if(pressedSwapEnter == 1 &&  mouseY <= (35*15)-9 + offset && mouseX >= 68 && mouseX <= 117 && mouseY >=(35*15)-49 + offset)
+				else if(pressedSwapEnter == 1 &&  mouseY <= (35*15)-9 + OFFSET && mouseX >= 68 && mouseX <= 117 && mouseY >=(35*15)-49 + OFFSET)
 				{
 					for(i = 0; i < 7; i++)
 					{
@@ -1935,7 +1935,7 @@
 					var bottom:int = 0;
 					for (i = 0; i < 7; i++)
 					{
-						if (mouseX >= 38*i+130 && mouseX <= 38*(i+1)+130 && mouseY >= 35*15+1+offset && mouseY <= 35*15+48+offset)
+						if (mouseX >= 38*i+130 && mouseX <= 38*(i+1)+130 && mouseY >= 35*15+1+OFFSET && mouseY <= 35*15+48+OFFSET)
 						{
 							//Placing tile from swap rack to rack
 							if(currentTiles[i].stringData == "empty")
@@ -1952,7 +1952,7 @@
 					{
 						for(i = 0; i < 7; i++)
 						{
-							if(mouseX >= 38*i+130 && mouseX <= 38*(i+1)+130 && mouseY >= (35*15)-55 + 8 + offset && mouseY <= (35*15)-55+48+offset)
+							if(mouseX >= 38*i+130 && mouseX <= 38*(i+1)+130 && mouseY >= (35*15)-55 + 8 + OFFSET && mouseY <= (35*15)-55+48+OFFSET)
 							{
 								//Placing tile from rack to swap rack
 								if(currentSwapTiles[i].stringData == "empty")
