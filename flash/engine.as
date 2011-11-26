@@ -478,7 +478,7 @@
 			var verticalWord:WordLine = expandVertical(highX, highY);		
 			
 			// This can only happen on the first turn. You've placed
-			// a single tile without no adjacencies.
+			// a single tile without any adjacencies.
 			if (horizontalWord == null && verticalWord == null) {
 				return [new WordLine(highX, highY, highX, highY, boardArray[highX][highY].stringData)];
 			}
