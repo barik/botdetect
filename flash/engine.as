@@ -988,24 +988,27 @@
 		
 		/**
 		 * Determines if the all the letters for the word
-		 * are available in the unused tile bag.
-		 *
-		 * TODO: This function is broken. You might use up a tile
-		 * and not realize that it isn't available anymore.
+		 * are available in the unused tile bag.		
 		 */
 		private function areLettersAvailable(word:String):Boolean {
 												
 			var randWordArray:Array = word.split("");
 			
 			// Make a shallow copy of the alphabet array.
-			var localAlphabetArray = alphabetArray.slice();
+			var localAlphabetArray = alphabetArray.concat();
 			
 			for(var i:int = 0; i < randWordArray.length; i++) {
+				
+				var indexOf:int = localAlphabetArray.indexOf(randWordArray[i]);
 						
 				// Could not find the letter in the alphabet array.
-				if (!(alphabetArray.indexOf(randWordArray[i]) > -1)) {
+				if (indexOf == -1) {
 					return false;
-				}								
+				}	
+				else {
+					// Remove the letter from the local array and continue.
+					localAlphabetArray.splice(indexOf, 1);
+				}
 			}
 			
 			return true;
@@ -1018,31 +1021,16 @@
 		 * decided to skip their first turn.
 		 */
 		private function computeStarWord():String {
-			
-			var compositionCorrect:Boolean = false;
-			var compositionCount:int = 0;
+						
 			var word:String;
 			
-			while(!compositionCorrect) {
-					
-				compositionCount = 0;
-				word = wordDict.random();
-				
-				var randWordArray:Array = word.split("");
-				for(var i:int = 0; i < randWordArray.length; i++)
-				{
-					
-					// Could not find the letter in the alphabet array.
-					if (!(alphabetArray.indexOf(randWordArray[i]) > -1)) {
-						break;
-					}
-					compositionCount++;
+			while(true) {
+									
+				word = wordDict.random();				
+				if (areLettersAvailable(word)) {
+					break;
 				}
-				trace(randWordArray.length, compositionCount);
 				
-				if (compositionCount == randWordArray.length) {
-					compositionCorrect = true;
-				}
 			}
 			
 			return word;
@@ -1050,9 +1038,18 @@
 		}
 		
 		/**
+		 * This turn is only used when the Player passes or swaps their
+		 * tiles so that the star is still available.
+		 */
+		private function computerStarTurn() {
+			return;
+		}
+		
+		/**
 		 * The Player has pressed the pass button.
 		 */
 		public function pressPassButton() {
+			
 			turn++;
 					
 			variables = new URLVariables();
@@ -1076,8 +1073,10 @@
 			
 			// Next have the computer take it's turn, IF it's the first turn, just lay a tile on the star horizontally
 			// TODO: Move this to it's own function. Looks like it's pasted twice.
-			if(turn == 1)
+			if (turn == 1)
 			{
+				computeStarTurn();
+				
 				var compositionCorrect:int = 0;
 				var compositionCount:int = 0;
 				var randWord:String = computeStarWord();
@@ -1116,8 +1115,7 @@
 				trace("Computer Score: " + computerScore);
 				scoreBox.text = "Player: " + playerScore + "				Computer: "+computerScore;
 			}
-			else
-			{
+			else {
 				computerGo();
 			}
 			
@@ -1125,7 +1123,7 @@
 
 		function onUnclick(eventObject:MouseEvent) {
 			
-			dataArray.push("Mouse_Unclick,"+mouseX+","+mouseY+","+getTimer());
+			dataArray.push("Mouse_Unclick," + mouseX + "," +mouseY + "," +getTimer());
 			
 			if(swappingTiles != 1 && gameMode == 1 && readingText == 0) {
 				for (var i:int = numChildren-1; i >= 0; i--)
@@ -1371,7 +1369,6 @@
 					
 					pressPassButton();
 					
-					
 				}
 				
 				// The player has hit the submit button.
@@ -1379,9 +1376,7 @@
 						 mouseY <= 35*15+48 + OFFSET && mouseX >=10 && 
 						 mouseX <=60) {					
 					
-					pressSubmitButton();																			
-					// TODO: You Won!!
-					
+					pressSubmitButton();
 				}
 														
 			} // What the heck is this closing? Swap mode?
@@ -1990,6 +1985,7 @@
 											variables.nonce = idArray[1];
 											variables.action = "submit";
 											variables["data[]"] = dataArray;
+											
 											var request:URLRequest = new URLRequest(WWF_URL);
 											request.data = variables;
 											request.method = URLRequestMethod.POST;
