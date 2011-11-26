@@ -1042,7 +1042,48 @@
 		 * tiles so that the star is still available.
 		 */
 		private function computerStarTurn() {
-			return;
+						
+			var randWord:String = computeStarWord();							
+			var randWordArray:Array = randWord.split("");
+			
+			for (var i:int = 0; i < randWordArray.length; ++i) {
+				boardArray[7][i+7].stringData = randWordArray[i];
+				boardArray[7][i+7].gotoAndStop(boardArray[7][i+7].stringData);				
+			}
+			
+			var scoreChange:int = 0;
+			var doubleWord:int = 0; 
+			for(var i = 0; i < randWordArray.length; i++)
+			{
+				boardArray[7][i+7].stringData = randWordArray[i];
+				boardArray[7][i+7].valLock = 1;
+				boardArray[7][i+7].gotoAndStop(boardArray[7][i+7].stringData);
+				if(boardSymbolArray[7][i+7] == "dw")
+				{
+					doubleWord++;
+					scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
+					boardSymbolArray[7][7+i] = "em";
+					boardTileArray[7][7+i] = "lo";
+				}
+				else
+				{
+					scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
+					boardSymbolArray[7][7+i] = "em";
+					boardTileArray[7][7+i] = "lo";
+				}
+			}
+			if(doubleWord != 0)
+			{
+				computerScore = computerScore + scoreChange*(2*doubleWord);
+			}
+			else
+			{
+				computerScore = computerScore + scoreChange;
+			}
+			trace("Player Score: " + playerScore);
+			trace("Computer Score: " + computerScore);
+			scoreBox.text = "Player: " + playerScore + "				Computer: "+computerScore;
+			
 		}
 		
 		/**
@@ -1069,51 +1110,11 @@
 			dataArray = [];
 			
 			// Remove stray tiles on the board and put them back on the rack.
-			removeStrayTiles();					
+			removeStrayTiles();				
 			
 			// Next have the computer take it's turn, IF it's the first turn, just lay a tile on the star horizontally
-			// TODO: Move this to it's own function. Looks like it's pasted twice.
-			if (turn == 1)
-			{
-				computeStarTurn();
-				
-				var compositionCorrect:int = 0;
-				var compositionCount:int = 0;
-				var randWord:String = computeStarWord();
-								
-				var randWordArray:Array = randWord.split("");
-				var scoreChange:int = 0;
-				var doubleWord:int = 0; 
-				for(var i = 0; i < randWordArray.length; i++)
-				{
-					boardArray[7][i+7].stringData = randWordArray[i];
-					boardArray[7][i+7].valLock = 1;
-					boardArray[7][i+7].gotoAndStop(boardArray[7][i+7].stringData);
-					if(boardSymbolArray[7][i+7] == "dw")
-					{
-						doubleWord++;
-						scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
-						boardSymbolArray[7][7+i] = "em";
-						boardTileArray[7][7+i] = "lo";
-					}
-					else
-					{
-						scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
-						boardSymbolArray[7][7+i] = "em";
-						boardTileArray[7][7+i] = "lo";
-					}
-				}
-				if(doubleWord != 0)
-				{
-					computerScore = computerScore + scoreChange*(2*doubleWord);
-				}
-				else
-				{
-					computerScore = computerScore + scoreChange;
-				}
-				trace("Player Score: " + playerScore);
-				trace("Computer Score: " + computerScore);
-				scoreBox.text = "Player: " + playerScore + "				Computer: "+computerScore;
+			if (turn == 1) {
+				computerStarTurn();
 			}
 			else {
 				computerGo();
@@ -1490,64 +1491,10 @@
 					
 					// swap is like pass.. this code has to be redone
 					turn++;
-					if(turn == 1)
-					{
-						var compositionCorrect:int = 0;
-						var compositionCount:int = 0;
-						while(compositionCorrect == 0)
-						{
-							var randWord:String = wordDict.random();
-							var randWordArray:Array = randWord.split("");
-							for(i = 0; i < randWordArray.length; i++)
-							{
-								if(!(alphabetArray.indexOf(randWordArray[i]) > -1))
-								{
-									break;
-								}
-								compositionCount++;
-							}
-							if(compositionCount == randWordArray.length)
-							{
-								compositionCorrect =1;
-							}
-						}
-						
-						var scoreChange:int = 0;
-						var doubleWord:int = 0; 
-						for(i = 0; i < randWordArray.length; i++)
-						{
-							boardArray[7][i+7].stringData = randWordArray[i];
-							boardArray[7][i+7].valLock = 1;
-							boardArray[7][i+7].gotoAndStop(boardArray[7][i+7].stringData);
-							if(boardSymbolArray[7][i+7] == "dw")
-							{
-								doubleWord++;
-								scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
-								boardSymbolArray[7][7+i] = "em";
-								boardTileArray[7][7+i] = "lo";
-							}
-							else
-							{
-								scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
-								boardSymbolArray[7][7+i] = "em";
-								boardTileArray[7][7+i] = "lo";
-							}
-						}
-						if(doubleWord != 0)
-						{
-							computerScore = computerScore + scoreChange*(2*doubleWord);
-						}
-						else
-						{
-							computerScore = computerScore + scoreChange;
-						}
-						trace("Player Score: "+playerScore);
-						trace("Computer Score: "+computerScore);
-						scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
-						turn++;
+					if(turn == 1) {
+						computerStarTurn();
 					}
-					else
-					{
+					else {
 						computerGo();
 					}
 					
