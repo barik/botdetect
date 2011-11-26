@@ -1059,12 +1059,12 @@
 			// is the one who generated them in the first place.
 			var wordLines:Array = expandWords();
 			
+			// Lock these tiles.
+			lockWords(wordLines);			
+			
 			// Calculate a score.
 			computerScore += calculatePlayerScore(wordLines);
-			
-			// Lock these tiles.
-			lockWords(wordLines);
-			
+						
 			// Remove bonus tiles.
 			clearBonusTiles();
 			
