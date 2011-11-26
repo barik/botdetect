@@ -414,8 +414,7 @@
 			var endY:int = y;
 			
 			while (startY - 1 >= 0 && boardTileArray[x][startY - 1] != "em") startY--;
-			while (endY + 1 < 15 && boardTileArray[x][endY + 1] != "em") endY++;			
-			}
+			while (endY + 1 < 15 && boardTileArray[x][endY + 1] != "em") endY++;						
 			
 			if (startY == endY) return null;
 			
