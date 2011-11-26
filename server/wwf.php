@@ -58,6 +58,12 @@ elseif ($action == 'submit') {
 	$ip = $_SERVER['REMOTE_ADDR'];
 	$id = $_REQUEST['id'];
 	$nonce = $_REQUEST['nonce'];
+	
+	if (!isset($_REQUEST['data'])) {
+		echo "result=nodata";
+		exit();
+	}
+	
 	$data = $_REQUEST['data'];
 	
 	if (!isValidUser($id, $nonce)) {
