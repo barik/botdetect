@@ -409,7 +409,8 @@
 				
 		function expandHorizontal(x:int, y:int): WordLine {
 			
-			trace("Expanding horizontal at: (" + x + "," + y + ").");
+			trace("Expanding horizontal at: (" + x + "," + y + ") with " 
+				  + boardTileArray[x][y] + ".");
 			
 			var startY:int = y;			
 			var endY:int = y;
@@ -1044,43 +1045,29 @@
 		 */
 		private function computerStarTurn() {
 						
-			var randWord:String = computeStarWord();							
+			var randWord:String = computeStarWord();
 			var randWordArray:Array = randWord.split("");
 			
+			// Place the tiles for the selected word on the board.
 			for (var i:int = 0; i < randWordArray.length; ++i) {
+				boardTileArray[7][i+7] = randWordArray[i];
 				boardArray[7][i+7].stringData = randWordArray[i];
 				boardArray[7][i+7].gotoAndStop(boardArray[7][i+7].stringData);				
 			}
+						
+			// Generate list of words; assume valid since the computer
+			// is the one who generated them in the first place.
+			var wordLines:Array = expandWords();
 			
-			var scoreChange:int = 0;
-			var doubleWord:int = 0; 
-			for(var i = 0; i < randWordArray.length; i++)
-			{
-				boardArray[7][i+7].stringData = randWordArray[i];
-				boardArray[7][i+7].valLock = 1;
-				boardArray[7][i+7].gotoAndStop(boardArray[7][i+7].stringData);
-				if(boardSymbolArray[7][i+7] == "dw")
-				{
-					doubleWord++;
-					scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
-					boardSymbolArray[7][7+i] = "em";
-					boardTileArray[7][7+i] = "lo";
-				}
-				else
-				{
-					scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
-					boardSymbolArray[7][7+i] = "em";
-					boardTileArray[7][7+i] = "lo";
-				}
-			}
-			if(doubleWord != 0)
-			{
-				computerScore = computerScore + scoreChange*(2*doubleWord);
-			}
-			else
-			{
-				computerScore = computerScore + scoreChange;
-			}
+			// Calculate a score.
+			computerScore += calculatePlayerScore(wordLines);
+			
+			// Lock these tiles.
+			lockWords(wordLines);
+			
+			// Remove bonus tiles.
+			clearBonusTiles();
+			
 			trace("Player Score: " + playerScore);
 			trace("Computer Score: " + computerScore);
 			scoreBox.text = "Player: " + playerScore + "				Computer: "+computerScore;
