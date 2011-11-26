@@ -334,7 +334,8 @@
 			var endX:int = location[0];
 			var endY:int = location[1];
 			
-			trace("Highest priority tile is: (" + startX + " " + startY + ").");
+			trace("Highest priority tile is: (" + startX + "," 
+				  + startY + ") with " + boardTileArray[startX][startY] + ".");
 			
 			// Make sure that all new pieces are either horizontal or 
 			// vertical, but don't care about gaps just yet. The
@@ -464,7 +465,7 @@
 		// guaranteed that at least one new tile exists.
 		function expandWords() : Array {			
 		
-			trace("Expanding words.");
+			trace("Expanding words:");
 			
 			var wordLines:Array = [];
 			
@@ -492,7 +493,7 @@
 			for (var i:int = highX + 1; i < 15; ++i) {
 				for (var j:int = highY; j < 15; ++j) {
 										
-					// Expand horizontally, since vertical has already been expanded.
+					// Expand vertically, since horizontal has already been expanded.
 					if (isUnlockedTile(i,j) && i == highX) {
 						
 						verticalWord = expandVertical(i, j);
@@ -502,7 +503,7 @@
 												
 					}
 					
-					// Expand vertically, since horizontal has already been expanded.
+					// Expand horizontally, since vertical has already been expanded.
 					if (isUnlockedTile(i, j) && i == highY) {
 						
 						horizontalWord = expandHorizontal(i, j);						
