@@ -981,7 +981,7 @@
 			trace("Computer Score: "+ computerScore);
 			scoreBox.text = "Player: " + playerScore + "				Computer: " + computerScore;
 		
-			turn++;											
+			turn++;										
 			computerGo();
 			
 		}
@@ -1119,6 +1119,41 @@
 			else {
 				computerGo();
 			}
+			
+		}
+
+		/**
+		 * The Player has pressed the shuffle button.
+		 */
+		public function pressShuffleButton() {
+			
+			var permutationArray:Array = [];
+			
+			for(var i:int = 0; i < 7; i++) {
+				permutationArray.push(i);
+			}
+			
+			for(i = 0; i < 7; i++)
+			{
+				var randIndex:int = Math.floor(Math.random() * 7);
+				
+				// Swap i with randIndex
+				var tempString:String = currentTiles[i].stringData;
+				currentTiles[i].stringData = currentTiles[randIndex].stringData;
+				currentTiles[randIndex].stringData = tempString;
+				currentTiles[i].gotoAndStop(currentTiles[i].stringData);
+				currentTiles[randIndex].gotoAndStop(currentTiles[randIndex].stringData);
+			}
+			
+			dataArray.push("New_Rack," + 
+						   currentTiles[0].stringData + "," + 
+						   currentTiles[1].stringData + "," +
+						   currentTiles[2].stringData + "," + 
+						   currentTiles[3].stringData + "," +
+						   currentTiles[4].stringData + "," +
+						   currentTiles[5].stringData + "," +
+						   currentTiles[6].stringData + "," + 
+						   getTimer());
 			
 		}
 
@@ -1313,26 +1348,9 @@
 					newLetter = null;
 				}
 				
-				else if (pressedShuffle == 1 && mouseY >=35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >= 68 && mouseX <=117)
-				{
-					//Shuffle your letters
-					var permutationArray:Array = [];
-					for(i = 0; i < 7; i++)
-					{
-						permutationArray.push(i);
-					}
-					for(i = 0; i < 7; i++)
-					{
-						var randIndex:int = Math.floor(Math.random() * 7);
-						//swap i with randIndex
-						tempString = currentTiles[i].stringData;
-						currentTiles[i].stringData = currentTiles[randIndex].stringData;
-						currentTiles[randIndex].stringData = tempString;
-						currentTiles[i].gotoAndStop(currentTiles[i].stringData);
-						currentTiles[randIndex].gotoAndStop(currentTiles[randIndex].stringData);
-					}
-					
-					dataArray.push("New_Rack,"+currentTiles[0].stringData+","+currentTiles[1].stringData+","+currentTiles[2].stringData+","+currentTiles[3].stringData+","+currentTiles[4].stringData+","+currentTiles[5].stringData+","+currentTiles[6].stringData+","+getTimer());
+				else if (pressedShuffle == 1 && mouseY >=35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >= 68 && mouseX <=117) {
+					pressShuffleButton();
+								
 				}
 				else if (pressedSwap == 1 && mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >= 408 && mouseX <= 458)
 				{
