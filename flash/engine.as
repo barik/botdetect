@@ -294,7 +294,10 @@
 			else return false;
 		}
 		
-		// Returns the tile that is highest and leftmost of all other tiles.
+		/** 
+		 * Returns the tile that is highest and leftmost of all other unlocked tiles.
+		 * This is a useful function that is used by many other functions.
+		 */
 		private function findHighestTile(): Array {
 						
 			for (var i:int = 0; i < 15; i++) {
@@ -410,12 +413,8 @@
 			var startY:int = y;			
 			var endY:int = y;
 			
-			while (startY - 1 >= 0 && boardTileArray[x][startY - 1] != "em") {
-				startY--;
-			}
-			
-			while (endY + 1 < 15 && boardTileArray[x][endY + 1] != "em") {
-				endY++;			
+			while (startY - 1 >= 0 && boardTileArray[x][startY - 1] != "em") startY--;
+			while (endY + 1 < 15 && boardTileArray[x][endY + 1] != "em") endY++;			
 			}
 			
 			if (startY == endY) return null;
