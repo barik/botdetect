@@ -9,12 +9,13 @@
 	import flash.text.TextFormat;
 	import flash.net.*;
 	import flash.utils.*;
+	import flashx.textLayout.elements.InlineGraphicElement;
 	
 
 	public class engine extends MovieClip
 	{
 
-		//This holds the tile objects
+		// This holds the tile objects
 		public var boardArray:Array = [];
 		public var holdingTile:int = 0;
 		public var newLetter:letters;
@@ -24,7 +25,7 @@
 		public var startIndex:int = -1;
 		public var startTopBottom:int = -1;
 		
-		//0 = before game, 1 = during game, 2 = after game;
+		// 0 = before game, 1 = during game, 2 = after game;
 		public var gameMode:int = 0;
 		public var readingText:int = 0;
 		
@@ -53,17 +54,18 @@
 		public var frameCount:int = 0;
 		public var dataArray:Array = [];
 		
-		public static const WWF_URL:String = "http://ciigar.csc.ncsu.edu/tbarik/wwf/wwf.php";
-		//public static const WWF_URL:String = "http://localhost/wwf/wwf.php";
+		// The number of points needed to win the game.
+		// TODO: Computer does not win on correct turn. Example: Set points to 3.
+		public static const POINTS_TO_WIN:int = 150;
 		
-		//POST variables
-		var variables:URLVariables;
-		var idArray:Array;
+		// public static const WWF_URL:String = "http://ciigar.csc.ncsu.edu/tbarik/wwf/wwf.php";
+		public static const WWF_URL:String = "http://localhost/wwf/wwf.php";
 		
-			
-			
+		// POST variables
+		public var variables:URLVariables;
+		public var idArray:Array;
 		
-		//This tells me what's originally in each square (is it triple word, double letter, or what).
+		// This tells me what's originally in each square (is it triple word, double letter, or what).
 		public var boardSymbolArray:Array = [
 		 ["tw", "em", "em", "dl", "em", "em", "em", "tw", "em", "em", "em", "dl", "em", "em", "tw"],
 		 ["em", "dw", "em", "em", "em", "tl", "em", "em", "em", "tl", "em", "em", "em", "dw", "em"],
@@ -82,6 +84,7 @@
 		 ["tw", "em", "em", "dl", "em", "em", "em", "tw", "em", "em", "em", "dl", "em", "em", "tw"]
 		];
 
+		// And no one really knows what this array does.
 		public var boardTileArray:Array = [ 
 		 ["em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em"],
 		 ["em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em", "em"],
@@ -174,10 +177,11 @@
 			scoreBox.text = "Player: 0				Computer: 0";
 			addChild(scoreBox);
 			wordDict = new wordDictionary();
-			for (var i = 0; i < 15; i++)
+			
+			for (var i:int = 0; i < 15; i++)
 			{
 				var tempArray:Array = [];
-				for (var j = 0; j < 15; j++)
+				for (var j:int = 0; j < 15; j++)
 				{
 					var exampleTile:tiles = new tiles(boardSymbolArray[i][j]);
 					tempArray.push(exampleTile);
@@ -232,6 +236,7 @@
 			passButton.x = 466;
 			passButton.y = 35*15+6 + OFFSET;
 			addChild(passButton);
+			
 			infoBox = new TextField();
 			infoFormat = new TextFormat();
 			infoFormat.size = 16;
@@ -243,7 +248,15 @@
 			infoBox.background = true;
 			infoBox.wordWrap = true;
 			infoBox.autoSize = "left";
-			infoBox.text = "Thank you for choosing to play Scrabblesque! The rules to this game are the same as the rules for Scrabble. Earn points by placing tiles on the board to make words. You will be going first. To begin, place a word through the star tile in the middle of the board. Remember that your words must use at least one letter from a word that already exists on the board. The game will end when either you or the computer gets to 150 points. Click anywhere to begin!";
+			infoBox.text = "Thank you for choosing to play Scrabblesque! " + 
+				"The rules to this game are the same as the rules for Scrabble. " + 
+				"Earn points by placing tiles on the board to make words. " + 
+				"You will be going first. " + 
+				"To begin, place a word through the star tile in the middle of the board. " + 
+				"Remember that your words must use at least one letter from a word that already exists on the board. " + 
+				"The game will end when either you or the computer gets to " + POINTS_TO_WIN + " points. " + 
+				"Click anywhere to begin!";
+			
 			addChild(infoBox);
 			addEventListener(Event.ENTER_FRAME, onFrameEnter);
 			addEventListener(MouseEvent.MOUSE_DOWN, onClick);
@@ -266,40 +279,485 @@
 			}
 			frameCount = frameCount % 6;
 		}
+		
+		/** 
+		 * Checks to see if there is an adjacent unlocked tile for a given tile.
+		 * For any word except the first, one of the unlocked tiles 
+		 * must be adjacent to an already locked tile.
+		 */
+		private function hasAdjacent(x:int, y:int): Boolean {
+									
+			if (x + 1 < 15 && boardTileArray[x + 1][y] == "lo") return true;
+			else if (x - 1 > 0 && boardTileArray[x - 1][y] == "lo") return true;
+			else if (y + 1 < 15 && boardTileArray[x][y + 1] == "lo") return true;
+			else if (y - 1 > 0 && boardTileArray[x][y - 1] == "lo") return true;
+			else return false;
+		}
+		
+		// Returns the tile that is highest and leftmost of all other tiles.
+		private function findHighestTile(): Array {
+						
+			for (var i:int = 0; i < 15; i++) {
+				for (var j:int = 0; j < 15; j++) {
+					if (isUnlockedTile(i, j)) {
+						return [i, j];						
+					}																		
+				}
+			}
+			
+			return null;
+			
+		}
+		
+		/**
+		 * Determine whether or not all tiles that you have placed are linear.
+		 * That is, it is either horizontal or vertical with no empty spaces.
+		 *
+		 * The parameter needsLocked additionally checks to see that at least
+		 * one of the tiles is touching an already placed tile.
+		 */
+		private function linearTiles(firstTurn:Boolean = false) {
+						
+			trace("Performing linear tiles test with firstTurn: " +firstTurn);
+						
+			var horizontal:Boolean = false;
+			var vertical:Boolean = false;
+			
+			var location:Array = findHighestTile();
+			if (location == null) return false;
+						
+			var startX:int = location[0];
+			var startY:int = location[1];			
+			var endX:int = location[0];
+			var endY:int = location[1];
+			
+			trace("Highest priority tile is: (" + startX + " " + startY + ").");
+			
+			// Make sure that all new pieces are either horizontal or 
+			// vertical, but don't care about gaps just yet. The
+			// end of this loop will give us a starting and ending
+			// range.
+			for (var i:int = startX; i < 15; i++) {
+				for (var j:int = startY + 1; j < 15; j++) {
+					if (isUnlockedTile(i, j)) {												
+						
+						if (startX == i && !vertical) {							
+							endX = i;
+							endY = j;							
+							horizontal = true;
+						}						
+						else if (startY == j && !horizontal) {
+							endX = i;
+							endY = j;							
+							vertical = true;
+						}
+						else {
+							
+							// We've hit a piece that isn't in the same row or
+							// column as the highest priority tile.
+							
+							trace("Piece doesn't fit at all.");
+							return false;
+						}
+					}										
+				}
+			} // end for
+			
+			var hasAdjacentLocked:Boolean = false;
+			
+			// Using the horizontal flag, do a final pass to make sure 
+			// that the tiles are contiguous.			
+			if (horizontal) {				
+				for (j = startY; j <= endY; j++) {
+					if (boardTileArray[startX][j] == "em") {						
+						return false;
+					} 
+					
+					hasAdjacentLocked = hasAdjacentLocked || hasAdjacent(startX, j);					
+				} // end for
+			}
+			else {
+				for (i = startX; i <= endX; i++) {
+					if (boardTileArray[i][startY] == "em") {						
+						return false;
+					}
+					
+					hasAdjacentLocked = hasAdjacentLocked || hasAdjacent(i, startY);
+				} // end for
+			}
+			
+			if (firstTurn) {
+				return true;
+			}
+			else if (hasAdjacentLocked) {
+				trace("Linear test passed.");
+				return true;
+			}
+			else {
+				infoBox.text = "Your word must go through at least one letter " + 
+					"of a word that is already on the board. Click anywhere to continue.";
+				addChild(infoBox);
+				readingText = 1;
+			
+				return false;
+			}
+		}
+				
+		function expandHorizontal(x:int, y:int): WordLine {
+			
+			trace("Expanding horizontal at: (" + x + "," + y + ").");
+			
+			var startY:int = y;			
+			var endY:int = y;
+			
+			while (startY - 1 >= 0 && boardTileArray[x][startY - 1] != "em") {
+				startY--;
+			}
+			
+			while (endY + 1 < 15 && boardTileArray[x][endY + 1] != "em") {
+				endY++;			
+			}
+			
+			if (startY == endY) return null;
+			
+			trace("Expanding horizontal y from " + startY + " to " + endY + ".");
+			
+			var word:String = ""
+			for (var i:int = startY; i <= endY; i++) {				
+				word = word + boardArray[x][i].stringData;				
+			}
+			
+			return new WordLine(x, startY, x, endY, word);
+			
+			
+		}
+				
+		function expandVertical(x:int, y:int): WordLine {
+			
+			var startX:int = x;
+			var endX:int = x;
+			
+			while (startX - 1 >= 0 && boardTileArray[startX - 1][y] != "em") startX--;
+			while (endX + 1 < 15 && boardTileArray[endX + 1][y] != "em") endX++;
+			
+			if (startX == endX) return null;
+			
+			var word:String = ""
+			for (var j:int = startX; j <= endX; j++) {
+				word = word + boardArray[j][y].stringData;
+			}
+			
+			return new WordLine(startX, y, endX, y, word);
+		}
+		
+		
+		/**
+		 * Returns true is the tile is unlocked, and false otherwise.
+		 */
+		function isUnlockedTile(x:int, y:int): Boolean {
+			return boardTileArray[x][y] != "em" && boardTileArray[x][y] != "lo";
+		}
+		
+		// This function returns a set of all new "words". Determination
+		// of whether or not the word is actually a dictionary word
+		// is performed at a later stage.
+		//
+		// By this point, linearTiles is assumed to be called, so we're
+		// guaranteed that at least one new tile exists.
+		function expandWords() : Array {			
+		
+			trace("Expanding words.");
+			
+			var wordLines:Array = [];
+			
+			var location:Array = findHighestTile();			
+			var highX:int = location[0];
+			var highY:int = location[1];
+			
+			var horizontalWord:WordLine = expandHorizontal(highX, highY);
+			var verticalWord:WordLine = expandVertical(highX, highY);		
+			
+			// This can only happen on the first turn. You've placed
+			// a single tile without no adjacencies.
+			if (horizontalWord == null && verticalWord == null) {
+				return [new WordLine(highX, highY, highX, highY, boardArray[highX][highY].stringData)];
+			}
+			else {
+				if (horizontalWord) {
+					wordLines.push(horizontalWord);
+				}
+				if (verticalWord) {
+					wordLines.push(verticalWord);
+				}
+			}
+			
+			for (var i:int = highX + 1; i < 15; ++i) {
+				for (var j:int = highY; j < 15; ++j) {
+										
+					// Expand horizontally, since vertical has already been expanded.
+					if (isUnlockedTile(i,j) && i == highX) {
+						
+						verticalWord = expandVertical(i, j);
+						if (verticalWord) {
+							wordLines.push(verticalWord);
+						}
+												
+					}
+					
+					// Expand vertically, since horizontal has already been expanded.
+					if (isUnlockedTile(i, j) && i == highY) {
+						
+						horizontalWord = expandHorizontal(i, j);						
+						if (horizontalWord) {							
+							wordLines.push(horizontalWord);
+						}
+					}
+				}
+			}
+			
+			return wordLines;
+			
+		}
+				
+		function verifyTurn(firstTurn:Boolean = false) {
+			
+			// On the first turn, the center STAR tile needs to be covered.
+			if (firstTurn && boardTileArray[7][7] == "em") {
+				infoBox.text = "Your word needs to cross the star tile. " + 
+					"Please Try Again. Click anywhere to continue.";
+				
+				addChild(infoBox);
+				readingText = 1;
+			
+				return false;
+			}
+			
+			return linearTiles(firstTurn);
+					
+		}
+		
+		function refillRack() {
+			
+			// TODO: Take all when rack needs more tiles than we actually have.
+			
+			// Refill the player's rack.
+			for (var i:int = 0; i < currentTiles.length; i++) {
+				if (currentTiles[i].stringData == "empty") {
+					var randNum:int = Math.floor(Math.random() * alphabetArray.length);
+					currentTiles[i].stringData = alphabetArray[randNum];
+					alphabetArray.splice(randNum, 1);
+					currentTiles[i].gotoAndStop(currentTiles[i].stringData);
+				}
+			} // end foreach							
+			
+			dataArray.push("New_Rack," + 
+				currentTiles[0].stringData + "," + 
+				currentTiles[1].stringData + "," +
+				currentTiles[2].stringData + "," +
+				currentTiles[3].stringData + "," +
+				currentTiles[4].stringData + "," + 
+				currentTiles[5].stringData + "," +
+				currentTiles[6].stringData + "," +
+				getTimer());
+		}
+		
+		// Lock of all of the word tiles given a wordLines array.
+		function lockWords(wordLines: Array) {
+			for (var x:int = 0; x < wordLines.length; ++x) {
+				var word:WordLine = wordLines[x];
+				
+				for (var i:int = word.startX; i <= word.endX; i++) {
+					for (var j:int = word.startY; j <= word.endY; j++) {
+						boardTileArray[i][j] = "lo";
+						boardArray[i][j].valLock = 1;
+					}
+				}
+				
+			}
+			
+		}
+		
+		/**
+		 * Calculates the score for a single word. Assumes that
+		 * the word itself has already been validated.
+		 */
+		function calculateScoreForWord(word: WordLine):int {
+			
+			var score:int = 0;
+			
+			var doubleWord:int = 0;
+			var tripleWord:int = 0;
+			
+			for (var i:int = word.startX; i <= word.endX; ++i) {
+				for (var j:int = word.startY; j <= word.endY; ++j) {
+					
+					var letter:String = boardArray[i][j].stringData;
+					var letterScore:int = scoreDict[letter];
+					
+					if (boardSymbolArray[i][j] == "dl") {
+						letterScore *= 2;
+					}
+					else if (boardSymbolArray[i][j] == "tl") {
+						letterScore *= 3;
+					}
+					else if (boardSymbolArray[i][j] == "dw") {
+						doubleWord++;
+					}
+					else if (boardSymbolArray[i][j] == "dw") {
+						doubleWord++;
+					}
+				
+					trace("letterScore = " + letter + " " +  letterScore);
+					score += letterScore;
+				}
+			}
+			
+			if (doubleWord > 0) {
+				score = score * 2 * doubleWord;
+			}
+			
+			if (tripleWord > 0) {
+				score = score * 3 * tripleWord;
+			}
+			
+			trace("Score for " + word.word + " is " + score);
+			return score;
+			
+		}
+		
+		// Not sure why this should be any different than calculating the computer's score.
+		// TODO: Refactor.
+		function calculatePlayerScore(wordLines: Array):int {
+			
+			var score:int = 0;
+			
+			for (var i:int = 0; i < wordLines.length; ++i) {
+				var word:WordLine = wordLines[i];
+				score += calculateScoreForWord(word);
+			}
+			
+			return score;
+		}
+		
+		/**
+		 * Clears all of the bonus tiles on the board so that they can't
+		 * be re-used.
+		 */
+		function clearBonusTiles() {
+			
+			for (var i:int = 0; i < 15; i++) {
+				for (var j:int = 0; j < 15; j++) {
+					if (boardTileArray[i][j] == "lo") {
+						boardSymbolArray[i][j] = "em";
+					}
+				}
+			}
+			
+		}		
+		
+		/**
+		 * Verify words. This function will check the wordLines against
+		 * an actual dictionary to see if the words are in fact valid.
+		 */
+		function verifyWords(wordLines:Array):Boolean {
+			
+			for (var i:int = 0; i < wordLines.length; i++) {
+						
+				var word:WordLine = wordLines[i];
+				
+				dataArray.push("Word_Submitted," + word.word + "," + getTimer());
+				
+				trace("Found possible word: " + word.word);
+				if (!wordDict.contains(word.word)) {
+					trace(word.word + " is not a word");
+					infoBox.text = "The word " + word.word + 
+						" was not found. Please place another word and try again. Click anywhere to continue.";
+					
+					readingText = 1;
+					addChild(infoBox);
+					return false;
+				}
+				
+			}
+			
+			return true;
+		}
+		
+		/**
+		 * Remove any stray tiles on the board and place them back
+		 * on the rack.
+		 */
+		function removeStrayTiles() {
+			for (var i:int = 0; i < 15; i++) {
+				for (var j:int = 0; j < 15; j++) {
+					
+					if (boardArray[i][j].valLock != 1 && (boardArray[i][j].stringData != "tw" &&														 
+														 boardArray[i][j].stringData != "tl" && 
+														 boardArray[i][j].stringData != "dl" && 
+														 boardArray[i][j].stringData != "dw" && 
+														 boardArray[i][j].stringData != "em" && 
+														 boardArray[i][j].stringData != "st")) {
+						for (var k:int = 0; k < 7; k++) {
+							
+							if (currentTiles[k].stringData == "empty") {
+								
+								currentTiles[k].stringData = boardArray[i][j].stringData;
+								currentTiles[k].gotoAndStop(currentTiles[k].stringData);
+								
+								boardArray[i][j].stringData = boardSymbolArray[i][j];
+								boardArray[i][j].gotoAndStop(boardArray[i][j].stringData);
+								
+								break;
+							}
+							
+						} // end for
+					} // end if
+				} // end for j
+			} // end for i
+			
+		}
+		
 		function onClick(eventObject:MouseEvent)
 		{
 			
 			
 			dataArray.push("Mouse_Click,"+mouseX+","+mouseY+","+getTimer());
-			if(swappingTiles != 1 && gameMode == 1 && readingText == 0)
-			{
-				if (mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET)
-				{
+			if (swappingTiles != 1 && gameMode == 1 && readingText == 0) {
+				if (mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET) {
 					var index:int = -1;
+					
+					// User pressed the enter button.
 					if (mouseX >=10 && mouseX <=60)
 					{
 						pressedEnter = 1;
 						removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
 						addEventListener(MouseEvent.MOUSE_UP, onUnclick);
 					}	
+					
+					// User pressed the shuffle button.
 					else if(mouseX >= 68 && mouseX <= 117)
 					{
 						pressedShuffle = 1;
 						removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
 						addEventListener(MouseEvent.MOUSE_UP, onUnclick);
 					}
+					
+					// User pressed the swap button.
 					else if(mouseX >= 408 && mouseX <= 458)
 					{
 						pressedSwap = 1;
 						removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
 						addEventListener(MouseEvent.MOUSE_UP, onUnclick);
 					}		
+					
+					// User pressed the pass button.
 					else if(mouseX >= 466 && mouseX <= 516)
 					{
 						pressedPass = 1;
 						removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
 						addEventListener(MouseEvent.MOUSE_UP, onUnclick);
 					}
+										
 					else
 					{
 						for (var i = 0; i < 7; i++)
@@ -325,7 +783,8 @@
 						holdingTile = 1;
 						startIndex = index;
 					}
-				}
+				} // mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET
+				
 				else if (mouseY <= 35*15 + OFFSET)
 				{
 					var xIndex:int = -1;
@@ -441,13 +900,235 @@
 			addEventListener(MouseEvent.MOUSE_UP, onUnclick);
 		}
 
+		/**
+		 * The Player has pressed the submit button.
+		 */
+		public function pressSubmitButton() {
+			
+			// Submit Log Data
+			variables = new URLVariables();
+			variables.debug = true;
+			variables.id = idArray[0];
+			variables.nonce = idArray[1];
+			variables.action = "submit";
+			variables["data[]"] = dataArray;
+			var request:URLRequest = new URLRequest(WWF_URL);
+			request.data = variables;
+			request.method = URLRequestMethod.POST;
+					
+			var loader:URLLoader = new URLLoader();
+			loader.addEventListener(Event.COMPLETE, completeHandler);
+				
+			loader.load(request);	
+			dataArray = [];
+			
+			// It's time to verify the word choice. Using the new, fancy way!										
+			trace("Verifying tiles at turn " + turn + ".");
+			
+			if (!verifyTurn(turn == 0)) {
+				trace("Invalid Board Configuration");
+				infoBox.text = "Invalid board configuration. Click anywhere to continue.";
+				addChild(infoBox);
+				readingText = 1;
+				return;
+			}					
+								
+			var wordLines = expandWords();
+			var word:WordLine;															
+								
+			// If you can't verify the words, then back out.
+			if (!verifyWords(wordLines)) {
+				return;
+			}
+								
+			// Lock all of the words, since we've verified that they are correct.
+			lockWords(wordLines);		
+			
+			// Calculate the player's score.
+			playerScore += calculatePlayerScore(wordLines);
+			
+			if(playerScore >= POINTS_TO_WIN) {
+				gameMode = 3;
+				infoBox.text = "You Won! Thank you for playing. Click anywhere to play again";
+				addChild(infoBox);
+				
+				// Might as well re-post items.
+				variables = new URLVariables();
+				variables.debug = true;
+				variables.id = idArray[0];
+				variables.nonce = idArray[1];
+				variables.action = "submit";
+				variables["data[]"] = dataArray;
+				request = new URLRequest(WWF_URL);
+				request.data = variables;
+				request.method = URLRequestMethod.POST;
+		
+				loader = new URLLoader();
+				loader.addEventListener(Event.COMPLETE, completeHandler);
+		
+				loader.load(request);	
+				dataArray = [];
+				
+				return;
+			}
 
-		function onUnclick(eventObject:MouseEvent)
-		{
+			// Clear bonus tiles.
+			clearBonusTiles();
+
+			// Refill the rack.
+			refillRack();				
+
+			trace("Player Score: " + playerScore);
+			trace("Computer Score: "+ computerScore);
+			scoreBox.text = "Player: " + playerScore + "				Computer: " + computerScore;
+		
+			turn++;											
+			computerGo();
+			
+		}
+		
+		/**
+		 * Determines if the all the letters for the word
+		 * are available in the unused tile bag.
+		 *
+		 * TODO: This function is broken. You might use up a tile
+		 * and not realize that it isn't available anymore.
+		 */
+		private function areLettersAvailable(word:String):Boolean {
+												
+			var randWordArray:Array = word.split("");
+			
+			// Make a shallow copy of the alphabet array.
+			var localAlphabetArray = alphabetArray.slice();
+			
+			for(var i:int = 0; i < randWordArray.length; i++) {
+						
+				// Could not find the letter in the alphabet array.
+				if (!(alphabetArray.indexOf(randWordArray[i]) > -1)) {
+					return false;
+				}								
+			}
+			
+			return true;
+			
+		}
+		
+		/**
+		 * Have the computer return a word by laying a tile across the
+		 * star horizontally. This only applies if the Player has
+		 * decided to skip their first turn.
+		 */
+		private function computeStarWord():String {
+			
+			var compositionCorrect:Boolean = false;
+			var compositionCount:int = 0;
+			var word:String;
+			
+			while(!compositionCorrect) {
+					
+				compositionCount = 0;
+				word = wordDict.random();
+				
+				var randWordArray:Array = word.split("");
+				for(var i:int = 0; i < randWordArray.length; i++)
+				{
+					
+					// Could not find the letter in the alphabet array.
+					if (!(alphabetArray.indexOf(randWordArray[i]) > -1)) {
+						break;
+					}
+					compositionCount++;
+				}
+				trace(randWordArray.length, compositionCount);
+				
+				if (compositionCount == randWordArray.length) {
+					compositionCorrect = true;
+				}
+			}
+			
+			return word;
+			
+		}
+		
+		/**
+		 * The Player has pressed the pass button.
+		 */
+		public function pressPassButton() {
+			turn++;
+					
+			variables = new URLVariables();
+			variables.debug = true;
+			variables.id = idArray[0];
+			variables.nonce = idArray[1];
+			variables.action = "submit";
+			variables["data[]"] = dataArray;
+			var request:URLRequest = new URLRequest(WWF_URL);
+			request.data = variables;
+			request.method = URLRequestMethod.POST;
+			
+			var loader:URLLoader = new URLLoader();
+			loader.addEventListener(Event.COMPLETE, completeHandler);
+				
+			loader.load(request);
+			dataArray = [];
+			
+			// Remove stray tiles on the board and put them back on the rack.
+			removeStrayTiles();					
+			
+			// Next have the computer take it's turn, IF it's the first turn, just lay a tile on the star horizontally
+			// TODO: Move this to it's own function. Looks like it's pasted twice.
+			if(turn == 1)
+			{
+				var compositionCorrect:int = 0;
+				var compositionCount:int = 0;
+				var randWord:String = computeStarWord();
+								
+				var randWordArray:Array = randWord.split("");
+				var scoreChange:int = 0;
+				var doubleWord:int = 0; 
+				for(var i = 0; i < randWordArray.length; i++)
+				{
+					boardArray[7][i+7].stringData = randWordArray[i];
+					boardArray[7][i+7].valLock = 1;
+					boardArray[7][i+7].gotoAndStop(boardArray[7][i+7].stringData);
+					if(boardSymbolArray[7][i+7] == "dw")
+					{
+						doubleWord++;
+						scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
+						boardSymbolArray[7][7+i] = "em";
+						boardTileArray[7][7+i] = "lo";
+					}
+					else
+					{
+						scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
+						boardSymbolArray[7][7+i] = "em";
+						boardTileArray[7][7+i] = "lo";
+					}
+				}
+				if(doubleWord != 0)
+				{
+					computerScore = computerScore + scoreChange*(2*doubleWord);
+				}
+				else
+				{
+					computerScore = computerScore + scoreChange;
+				}
+				trace("Player Score: " + playerScore);
+				trace("Computer Score: " + computerScore);
+				scoreBox.text = "Player: " + playerScore + "				Computer: "+computerScore;
+			}
+			else
+			{
+				computerGo();
+			}
+			
+		}
+
+		function onUnclick(eventObject:MouseEvent) {
+			
 			dataArray.push("Mouse_Unclick,"+mouseX+","+mouseY+","+getTimer());
 			
-			if(swappingTiles != 1 && gameMode == 1 && readingText == 0)
-			{
+			if(swappingTiles != 1 && gameMode == 1 && readingText == 0) {
 				for (var i:int = numChildren-1; i >= 0; i--)
 				{
 					if (getChildAt(i) is letters)
@@ -683,1081 +1364,28 @@
 					}
 					trace("Entering Swap Tiles Mode");
 				}
-				else if(pressedPass == 1 && mouseY>= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >= 466 && mouseX <= 516)
-				{
-					turn++;
-					variables = new URLVariables();
-					variables.debug = true;
-					variables.id = idArray[0];
-					variables.nonce = idArray[1];
-					variables.action = "submit";
-					variables["data[]"] = dataArray;
-					var request:URLRequest = new URLRequest(WWF_URL);
-					request.data = variables;
-					request.method = URLRequestMethod.POST;
+				
+				// The player has hit the pass button.
+				else if(pressedPass == 1 && mouseY>= 35*15+8 + OFFSET && 
+						mouseY <= 35*15+48 + OFFSET && 
+						mouseX >= 466 && mouseX <= 516) {
 					
-					var loader:URLLoader = new URLLoader();
-					loader.addEventListener(Event.COMPLETE, completeHandler);
-						
-					loader.load(request);	
-					dataArray = [];
-					//First, check to see if there are any stray tiles on the board. If so, get rid of those guys. 
-					for(i = 0; i < 15; i++)
-					{
-						for(j = 0; j < 15; j++)
-						{
-							if(boardArray[i][j].valLock != 1 && (boardArray[i][j].stringData != "tw" && boardArray[i][j].stringData != "tl" && boardArray[i][j].stringData != "dl" && boardArray[i][j].stringData != "dw" && boardArray[i][j].stringData != "em" && boardArray[i][j].stringData != "st"))
-							{
-								for(var k:int = 0; k < 7; k++)
-								{
-									if(currentTiles[k].stringData == "empty")
-									{
-										currentTiles[k].stringData = boardArray[i][j].stringData;
-										currentTiles[k].gotoAndStop(currentTiles[k].stringData);
-										boardArray[i][j].stringData = boardSymbolArray[i][j];
-										boardArray[i][j].gotoAndStop(boardArray[i][j].stringData);
-										break;
-									}
-								}
-							}
-						}
-					}
+					pressPassButton();
 					
-					//Next have the computer take it's turn, IF it's the first turn, just lay a tile on the star horizontally
-					if(turn == 1)
-					{
-						var compositionCorrect:int = 0;
-						var compositionCount:int = 0;
-						var randWord:String;
-						while(compositionCorrect == 0)
-						{
-							compositionCount = 0;
-							randWord = wordDict.random();
-							randWordArray = randWord.split("");
-							for(i = 0; i < randWordArray.length; i++)
-							{
-								if(!(alphabetArray.indexOf(randWordArray[i]) > -1))
-								{
-									break;
-								}
-								compositionCount++;
-							}
-							trace(randWordArray.length, compositionCount);
-							if(compositionCount == randWordArray.length)
-							{
-								compositionCorrect =1;
-							}
-						}
-						
-						var randWordArray:Array = randWord.split("");
-						var scoreChange:int = 0;
-						var doubleWord:int = 0; 
-						for(i = 0; i < randWordArray.length; i++)
-						{
-							boardArray[7][i+7].stringData = randWordArray[i];
-							boardArray[7][i+7].valLock = 1;
-							boardArray[7][i+7].gotoAndStop(boardArray[7][i+7].stringData);
-							if(boardSymbolArray[7][i+7] == "dw")
-							{
-								doubleWord++;
-								scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
-								boardSymbolArray[7][7+i] = "em";
-								boardTileArray[7][7+i] = "lo";
-							}
-							else
-							{
-								scoreChange = scoreChange + scoreDict[boardArray[7][i+7].stringData];
-								boardSymbolArray[7][7+i] = "em";
-								boardTileArray[7][7+i] = "lo";
-							}
-						}
-						if(doubleWord != 0)
-						{
-							computerScore = computerScore + scoreChange*(2*doubleWord);
-						}
-						else
-						{
-							computerScore = computerScore + scoreChange;
-						}
-						trace("Player Score: "+playerScore);
-						trace("Computer Score: "+computerScore);
-						scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
-					}
-					else
-					{
-						computerGo();
-					}
+					
 				}
-				else if (pressedEnter == 1 && mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >=10 && mouseX <=60)
-				{
+				
+				// The player has hit the submit button.
+				else if (pressedEnter == 1 && mouseY >= 35*15+8 + OFFSET && 
+						 mouseY <= 35*15+48 + OFFSET && mouseX >=10 && 
+						 mouseX <=60) {					
 					
-					//Submit Log Data
-					variables = new URLVariables();
-					variables.debug = true;
-					variables.id = idArray[0];
-					variables.nonce = idArray[1];
-					variables.action = "submit";
-					variables["data[]"] = dataArray;
-					var request:URLRequest = new URLRequest(WWF_URL);
-					request.data = variables;
-					request.method = URLRequestMethod.POST;
-							
-					var loader:URLLoader = new URLLoader();
-					loader.addEventListener(Event.COMPLETE, completeHandler);
-						
-					loader.load(request);	
-					dataArray = [];
-									
-									
-					//Go on, verify that word choice. 
-					trace("Verifying Word Choice");
-					trace("Turn"+turn);
-					if (turn == 0)
-					{
-						if (boardTileArray[7][7] == "em")
-						{
-							trace("Your Word Needs to cross the star tile");
-							infoBox.text = "Your word needs to cross the star tile. Please Try Again. Click anywhere to continue.";
-							addChild(infoBox);
-							readingText = 1;
-						}
-						else
-						{
-							var frontIndex:int = 1;
-							var backIndex:int = 1;
-							var wordArray:Array = [];
-							var dir:String = "";
-							var valid:int = 1;
-							wordArray.push(boardTileArray[7][7]);
-							if (boardTileArray[7][7 + 1] != "em" || boardTileArray[7][7 - 1] != "em")
-							{
-								dir = "horizontal";
-							}
-							else if (boardTileArray[7+1][7] != "em" || boardTileArray[7-1][7] != "em")
-							{
-								dir = "vertical";
-							}
-							if (dir == "horizontal")
-							{
-								while (boardTileArray[7][7-frontIndex] != "em" || boardTileArray[7][7+backIndex] != "em")
-								{
-									if (boardTileArray[7][7 - frontIndex] != "em")
-									{
-										wordArray.unshift(boardTileArray[7][7-frontIndex]);
-										frontIndex++;
-									}
-									if (boardTileArray[7][7 + backIndex] != "em")
-									{
-										wordArray.push(boardTileArray[7][7+backIndex]);
-										backIndex++;
-									}
-								}
-								//Check for stray tiles
-								frontIndex = 7 - frontIndex + 1;
-								backIndex = 7 + backIndex - 1;
-								for (i =0; i < 15; i++)
-								{
-									for (var j:int = 0; j < 15; j++)
-									{
-										if (i != 7 || ((i == 7 && j <frontIndex)||(i == 7 && j > backIndex)))
-										{
-											//trace(boardTileArray[i][j]);
-											if (boardTileArray[i][j] != "em")
-											{
-												valid = 0;
-												break;
-											}
-										}
-									}
-								}
-							}
-							else
-							{
-								while (boardTileArray[7-frontIndex][7] != "em" || boardTileArray [7+backIndex][7] != "em")
-								{
-									if (boardTileArray[7 - frontIndex][7] != "em")
-									{
-										wordArray.unshift(boardTileArray[7-frontIndex][7]);
-										frontIndex++;
-									}
-									if (boardTileArray[7 + backIndex][7] != "em")
-									{
-										wordArray.push(boardTileArray[7+backIndex][7]);
-										backIndex++;
-									}
-								}
-								frontIndex = 7 - frontIndex + 1;
-								backIndex = 7 + backIndex - 1;
-								for (i =0; i < 15; i++)
-								{
-									for (j = 0; j < 15; j++)
-									{
-										if (j != 7 || ((j == 7 && i < frontIndex) || (j == 7 && i > backIndex)))
-										{
-											//trace(boardTileArray[i][j]);
-											if (boardTileArray[i][j] != "em")
-											{
-												valid = 0;
-												break;
-											}
-										}
-									}
-								}
-							}
-	
-							if (valid == 1)
-							{
-								var word:String = wordArray.join("");
-								trace(word);
-								dataArray.push("Word_Submitted,"+word+","+getTimer());
-								if (wordDict.contains(word))
-								{
-									trace("Word Accepted, Locking in place");
-									for (i = frontIndex; i < backIndex+1; i++)
-									{
-										if (dir == "horizontal")
-										{
-											boardTileArray[7][i] = "lo";
-											boardArray[7][i].valLock = 1;
-										}
-										else
-										{
-											boardTileArray[i][7] = "lo";
-											boardArray[i][7].valLock = 1;
-										}
-									}
-	
-									//Also, give them more letters
-	
-									for (i = 0; i < currentTiles.length; i++)
-									{
-										if (currentTiles[i].stringData == "empty")
-										{
-											var randNum:int = Math.floor(Math.random() * alphabetArray.length);
-											currentTiles[i].stringData = alphabetArray[randNum];
-											alphabetArray.splice(randNum, 1);
-											currentTiles[i].gotoAndStop(currentTiles[i].stringData);
-										}
-									}
-									dataArray.push("New_Rack,"+currentTiles[0].stringData+","+currentTiles[1].stringData+","+currentTiles[2].stringData+","+currentTiles[3].stringData+","+currentTiles[4].stringData+","+currentTiles[5].stringData+","+currentTiles[6].stringData+","+getTimer());
-									//This is where we'd calculate score
-									if(dir == "horizontal")
-									{
-										scoreChange = 0;
-										doubleWord = 0;
-										var currentIndex:int = frontIndex;
-										while(boardTileArray[7][currentIndex] != "em")
-										{
-											if(boardSymbolArray[7][currentIndex] == "dw")
-											{
-												scoreChange = scoreChange + scoreDict[boardArray[7][currentIndex].stringData];
-												boardSymbolArray[7][currentIndex] = "em";
-												doubleWord++;
-											}
-											else
-											{
-												scoreChange = scoreChange + scoreDict[boardArray[7][currentIndex].stringData];
-											}
-											currentIndex++;
-										}
-										if(doubleWord != 0)
-										{
-											playerScore = playerScore + scoreChange*(2*doubleWord);
-										}
-										else
-										{
-											playerScore = playerScore + scoreChange;
-										}
-									}
-									else if(dir == "vertical")
-									{
-										currentIndex = frontIndex;
-										scoreChange = 0;
-										doubleWord = 0;
-										while(boardTileArray[currentIndex][7] != "em")
-										{
-											if(boardSymbolArray[currentIndex][7] == "dw")
-											{
-												scoreChange = scoreChange + scoreDict[boardArray[currentIndex][7].stringData];
-												boardSymbolArray[currentIndex][7] = "em";
-												doubleWord++;
-											}
-											else
-											{
-												scoreChange = scoreChange + scoreDict[boardArray[currentIndex][7].stringData];
-											}
-											currentIndex++;
-										}
-										if(doubleWord != 0)
-										{
-											playerScore = playerScore + scoreChange*(2*doubleWord);
-										}
-										else
-										{
-											playerScore = playerScore + scoreChange;
-										}
-									}
-									trace("Player Score: "+playerScore);
-									trace("Computer Score: "+computerScore);
-									scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
-									turn++;
-									
-									computerGo();
-								}
-								else
-								{
-									trace(word+" is not a word");
-									infoBox.text = "The word "+word+" was not found. Please place another word and try again. Click anywhere to continue.";
-									readingText = 1;
-									addChild(infoBox);
-								}
-							}
-							else
-							{
-								trace("Invalid Board Configuration");
-								infoBox.text = "Invalid board configuration. Click anywhere to continue.";
-								addChild(infoBox);
-								readingText = 1;
-							}
-						}
-					}
-					else if(turn >= 0)
-					{
-						//What to do on turn 2 and beyond
-						//First, we need to find where we start
-						var startX:int = -1;
-						var startY:int = -1;
-						for (i = 0; i < 15; i++)
-						{
-							for (j = 0; j < 15; j++)
-							{
-								if (boardTileArray[i][j] != "em" && boardTileArray[i][j] != "lo")
-								{
-									startX = j;
-									startY = i;
-									break;
-								}
-							}
-						}
-	
-						trace(startX, startY);
-						//Figure out if the word runs horizontal or vertically
-						if (startX == -1 && startY == -1)
-						{
-							trace("Place tiles noob");
-							infoBox.text = "Please place tiles onto the board. Click anywhere to continue.";
-							addChild(infoBox);
-							readingText = 1;
-						}
-						else
-						{
-							var horizontalCount:int = 0;
-							var verticalCount:int = 0;
-							//Check vertically
-							for(i = 0; i < 15; i++)
-							{
-								if(boardTileArray[i][startX] != "em" && boardTileArray[i][startX] != "lo")
-								{
-									verticalCount++;
-								}
-								if(boardTileArray[startY][i] != "em" && boardTileArray[startY][i] != "lo")
-								{
-									horizontalCount++;
-								}
-							}
-							trace(horizontalCount, verticalCount);
-							if(verticalCount == 1 && horizontalCount == 1)
-							{
-								if(boardTileArray[startY-1][startX] != "em" || boardTileArray[startY+1][startX] != "em")
-								{
-									dir = "vertical";
-								}
-								else
-								{
-									dir = "horizontal";
-								}
-							}
-							else if(verticalCount > horizontalCount)
-							{
-								dir = "vertical";
-							}
-							else
-							{
-								dir = "horizontal";
-							}
-							
-		
-							trace(dir);
-							//Make sure it goes through at least 1 locked square
-							var front:int = 0;
-							var back:int = 0;
-							var foundLock:int = 0;
-							if (dir == "horizontal")
-							{
-								while ((startX-front >= 0 && boardTileArray[startY][startX-front] != "em") || (startX+back <= 14 && boardTileArray[startY][startX+back] != "em"))
-								{
-									if(startX - front >= 0)
-									{
-										if (boardTileArray[startY][startX - front] == "lo")
-										{
-											foundLock = 1;
-											break;
-										}
-										if (boardTileArray[startY][startX - front] != "em")
-										{
-											if((startY > 0 && boardTileArray[startY-1][startX-front] == "lo") || (startY < 14 && boardTileArray[startY+1][startX-front] == "lo"))
-											{
-												foundLock = 1;
-												break;
-											}
-											front++;
-										}
-									}
-									if(startX+back <= 14)
-									{
-										if (boardTileArray[startY][startX+back] == "lo")
-										{
-											foundLock = 1;
-											break;
-										}
-										if (boardTileArray[startY][startX + back] != "em")
-										{
-											if((startY > 0 && boardTileArray[startY-1][startX+back] =="lo") || (startY < 14 && boardTileArray[startY+1][startX+back] =="lo"))
-											{
-												foundLock = 1;
-												break;
-											}
-											back++;
-										}
-									}
-	
-								}
-								if (foundLock == 1)
-								{
-									trace("Good, your word goes through another one");
-									//Find the word length
-									front = 1;
-									back = 1;
-									wordArray = [];
-									if (boardTileArray[startY][startX] == "lo")
-									{
-										trace(boardArray[startY][startX].stringData);
-										wordArray.push(boardArray[startY][startX].stringData);
-									}
-									else
-									{
-										wordArray.push(boardTileArray[startY][startX]);
-									}
-									while ((startX - front >= 0 && boardTileArray[startY][startX-front] != "em") || (startX+back <= 14 && boardTileArray[startY][startX+back] != "em"))
-									{
-										if (startX-front >= 0 && boardTileArray[startY][startX - front] != "em")
-										{
-											if (boardTileArray[startY][startX - front] == "lo")
-											{
-												wordArray.unshift(boardArray[startY][startX-front].stringData);
-											}
-											else
-											{
-												wordArray.unshift(boardTileArray[startY][startX-front]);
-											}
-											front++;
-										}
-										if (startX + back <= 14 && boardTileArray[startY][startX + back] != "em")
-										{
-											if (boardTileArray[startY][startX + back] == "lo")
-											{
-												wordArray.push(boardArray[startY][startX+back].stringData);
-											}
-											else
-											{
-												wordArray.push(boardTileArray[startY][startX+back]);
-											}
-											back++;
-										}
-									}
-									front = startX - front;
-									back = startX + back;
-									front++;
-									back--;
-									trace(front,back);
-									word = wordArray.join("");
-									//Check the board for hanging tiles
-									valid = 1;
-									for (i =0; i < 15; i++)
-									{
-										for (j = 0; j < 15; j++)
-										{
-											if (i != startY || ((i == startY && j <front)||(i == startY && j > back)))
-											{
-												//trace(boardTileArray[i][j]);
-												if (boardTileArray[i][j] != "em" && boardTileArray[i][j] != "lo")
-												{
-													valid = 0;
-													break;
-												}
-											}
-										}
-									}
-	
-									trace(word);
-									if (valid == 1)
-									{
-										dataArray.push("Word_Submitted,"+word+","+getTimer());
-										if (wordDict.contains(word) && valid == 1)
-										{
-											//Check the adjacent stuff
-											trace("Found Word, checking adjacent words");
-											var adjacentWords:int = 1;
-											for (i = front; i<= back; i++)
-											{
-												if (boardTileArray[startY][i] != "lo")
-												{
-													if ((startY < 14 && boardTileArray[startY + 1][i] != "em") || (startY > 0 && boardTileArray[startY - 1][i] != "em"))
-													{
-														var subFront:int = 1;
-														var subBack:int = 1;
-														var subWord:Array = [];
-														subWord.push(boardTileArray[startY][i]);
-														while ((boardTileArray[startY-subFront][i] != "em" && startY-subFront != 0) || (boardTileArray[startY+subBack][i] != "em" && startY+subBack != 14))
-														{
-															if (startY - subFront >= 0 && boardTileArray[startY - subFront][i] == "lo")
-															{
-																subWord.unshift(boardArray[startY-subFront][i].stringData);
-																subFront++;
-															}
-															if (startY + subBack <= 14 && boardTileArray[startY + subBack][i] == "lo")
-															{
-																subWord.push(boardArray[startY+subBack][i].stringData);
-																subBack++;
-															}
-														}
-	
-														if (!(wordDict.contains(subWord.join(""))))
-														{
-															trace("Some words were not found");
-															adjacentWords = 0;
-															infoBox.text = "The word "+subWord.join("")+" was not found. Please place another word and try again. Click anywhere to continue.";
-															readingText = 1;
-															addChild(infoBox);
-														}
-													}
-												}
-											}
-											if(adjacentWords != 1)
-											{
-												trace("Some of your words ain't right");
-											}
-											else
-											{
-												trace("GOOD TO GO, LOCK IN AND ROLL OUT");
-												turn++;
-												//Check adjacent words FIRST
-												for(i = front; i < back; i++)
-												{
-													scoreChange = 0;
-													doubleWord = 0;
-													tripleWord  = 0; 
-													if(boardTileArray[startY][i] != "lo")
-													{
-														if ((startY < 14 && boardTileArray[startY + 1][i] != "em") || (startY > 0 && boardTileArray[startY - 1][i] != "em"))
-														{
-															subFront = 1;
-															subBack = 1;
-															if(boardSymbolArray[startY][i] == "dl")
-															{
-																scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData]*2;
-															}
-															else if(boardSymbolArray[startY][i] == "tl")
-															{
-																scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringdata]*3;
-															}
-															else if(boardSymbolArray[startY][i] == "dw")
-															{
-																scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
-																doubleWord++;
-															}
-															else if(boardSymbolArray[startY][i] == "tw")
-															{
-																scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
-																tripleWord++;
-															}
-															while (boardTileArray[startY-subFront][i] != "em" || boardTileArray[startY+subBack][i] != "em")
-															{
-																if (startY - subFront >= 0 && boardTileArray[startY - subFront][i] == "lo")
-																{
-																	scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
-																	subFront++;
-																}
-																if (startY + subBack <= 14 && boardTileArray[startY + subBack][i] == "lo")
-																{
-																	scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
-																	subBack++;
-																}
-															}
-															if(doubleWord != 0)
-															{
-																playerScore = playerScore + scoreChange*(2*doubleWord);
-															}
-															else if (tripleWord != 0)
-															{
-																playerScore = playerScore + scoreChange*(3*tripleWord);
-															}
-															else
-															{
-																playerScore = playerScore + scoreChange;
-															}
-														}
-													}
-												}
-												scoreChange = 0;
-												doubleWord = 0;
-												var tripleWord:int = 0; 
-												for(i = front; i <= back; i++)
-												{
-													boardArray[startY][i].valLock = 1;
-													boardTileArray[startY][i] = "lo";
-													if(boardSymbolArray[startY][i] == "tl")
-													{
-														scoreChange = scoreChange + (scoreDict[boardArray[startY][i].stringData] * 3);
-													}
-													else if(boardSymbolArray[startY][i] == "dl")
-													{
-														scoreChange = scoreChange + (scoreDict[boardArray[startY][i].stringData] * 2);
-													}
-													else if(boardSymbolArray[startY][i] == "tw")
-													{
-														scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
-														tripleWord++;  
-													}
-													else if(boardSymbolArray[startY][i] == "dw")
-													{
-														scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
-														doubleWord++;
-													}
-													else
-													{
-														scoreChange = scoreChange + scoreDict[boardArray[startY][i].stringData];
-													}
-													boardSymbolArray[startY][i] = "em";
-												}
-											
-												if(tripleWord != 0)
-												{
-													playerScore = playerScore + (scoreChange*(3*tripleWord));
-												}
-												else if(doubleWord != 0)
-												{
-													playerScore = playerScore + (scoreChange*(2*doubleWord));
-												}
-												else
-												{
-													playerScore = playerScore + scoreChange;
-												}	
-	
-	
-												//Calculate score change due to adjacent words
-												for (i = 0; i < currentTiles.length; i++)
-												{
-													if (currentTiles[i].stringData == "empty")
-													{
-														randNum = Math.floor(Math.random() * alphabetArray.length);
-														currentTiles[i].stringData = alphabetArray[randNum];
-														alphabetArray.splice(randNum, 1);
-														currentTiles[i].gotoAndStop(currentTiles[i].stringData);
-													}
-												}
-												
-												scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
-												if(playerScore >= 150)
-												{
-													gameMode = 3;
-													infoBox.text = "You Won!!! Thank you for playing. Click anywhere to play again";
-													addChild(infoBox);
-													
-													//Might as well post stuff
-													variables = new URLVariables();
-													variables.debug = true;
-													variables.id = idArray[0];
-													variables.nonce = idArray[1];
-													variables.action = "submit";
-													variables["data[]"] = dataArray;
-													request = new URLRequest(WWF_URL);
-													request.data = variables;
-													request.method = URLRequestMethod.POST;
-											
-													loader = new URLLoader();
-													loader.addEventListener(Event.COMPLETE, completeHandler);
-											
-													loader.load(request);	
-													dataArray = [];
-												}
-												else
-												{
-													dataArray.push("New_Rack,"+currentTiles[0].stringData+","+currentTiles[1].stringData+","+currentTiles[2].stringData+","+currentTiles[3].stringData+","+currentTiles[4].stringData+","+currentTiles[5].stringData+","+currentTiles[6].stringData+","+getTimer());
-													computerGo();
-												}
-											}
-										}
-										else
-										{
-											trace("Word not found");
-											infoBox.text = "The word "+word+" was not found. Please place another word and try again. Click anywhere to continue.";
-											readingText = 1;
-											addChild(infoBox);
-										}
-									}
-									else
-									{
-										trace("Invalid Configuration");
-										infoBox.text = "Invalid board configuration. Click anywhere to continue.";
-										addChild(infoBox);
-										readingText = 1;
-									}
-								}
-								else
-								{
-									trace("Stop trying to cheat");
-									infoBox.text = "Your word must go through at least one letter of a word that is already on the board. Click anywhere to continue.";
-									addChild(infoBox);
-									readingText = 1;
-								}
-							}
-							else if (dir == "vertical")
-							{
-								while ((startY - front >= 0 && boardTileArray[startY-front][startX] != "em") || (startY + back <= 14 && boardTileArray[startY+back][startX] != "em"))
-								{
-									if(startY - front >= 0)
-									{
-										if (boardTileArray[startY - front][startX] == "lo")
-										{
-											foundLock = 1;
-											break;
-										}
-										if (boardTileArray[startY-front][startX] != "em")
-										{
-											if((startX > 0 && boardTileArray[startY-front][startX-1] == "lo") || (startX < 14 && boardTileArray[startY-front][startX+1] == "lo"))
-											{
-												foundLock = 1;
-												break;
-											}
-											front++;
-										}
-									}
-									if(startY + front <= 14)
-									{
-										if (boardTileArray[startY+back][startX] == "lo")
-										{
-											foundLock = 1;
-											break;
-										}
-									
-										if (boardTileArray[startY+back][startX] != "em")
-										{
-											if((startX > 0 && boardTileArray[startY+back][startX-1] == "lo") || (startX < 14 && boardTileArray[startY+back][startX+1] == "lo"))
-											{
-												foundLock = 1;
-												break;
-											}
-											back++;
-										}
-									}
-								}
-	
-								if (foundLock == 1)
-								{
-									trace("Good, your word goes through another one!");
-									//find word length
-									front = 1;
-									back = 1;
-									wordArray = [];
-									if(boardTileArray[startY][startX] == "lo")
-									{
-										wordArray.push(boardArray[startY][startX].stringData);
-									}
-									else
-									{
-										wordArray.push(boardTileArray[startY][startX]);
-									}
-									while((startY-front >= 0 && boardTileArray[startY-front][startX] != "em") || (startY+back <= 14 && boardTileArray[startY+back][startX] != "em"))
-									{
-										if(startY - front >= 0 && boardTileArray[startY-front][startX] != "em")
-										{
-											if(boardTileArray[startY-front][startX] == "lo")
-											{
-												wordArray.unshift(boardArray[startY-front][startX].stringData);
-											}
-											else
-											{
-												wordArray.unshift(boardTileArray[startY-front][startX]);
-											}
-											front++;
-										}
-										if(startY + back <= 14 && boardTileArray[startY+back][startX] != "em")
-										{
-											if(boardTileArray[startY+back][startX] == "lo")
-											{
-												wordArray.push(boardArray[startY+back][startX].stringData);
-											}
-											else
-											{
-												wordArray.push(boardTileArray[startY+back][startX]);
-											}
-											back++;
-										}
-									}
-									front = startY - front;
-									back = startY+back;
-									front++;
-									back--;
-									word = wordArray.join("");
-									//check the board for hanging tiles
-									valid = 1;
-									for(i = 0; i < 15; i++)
-									{
-										for(j = 0; j < 15; j++)
-										{
-											if(j != startX || ((j == startX && i < front) || (j == startX && i > back)))
-											{
-												if(boardTileArray[i][j] != "em" && boardTileArray[i][j] != "lo")
-												{
-													valid = 0;
-													break;
-												}
-											}
-										}
-									}
-									trace(word);
-									if(valid == 1)
-									{
-										dataArray.push("Word_Submitted,"+word+","+getTimer());
-										if(wordDict.contains(word))
-										{
-											//check the adjacent stuff
-											trace("Found word, checking adjacent words");
-											adjacentWords = 1;
-											for(i = front; i <= back; i++)
-											{
-												if(boardTileArray[i][startX] != "lo" && ((startX < 14 && boardTileArray[i][startX+1] != "em") || (startX > 0 && boardTileArray[i][startX-1] != "em")))
-												{
-													subFront = 1;
-													subBack = 1;
-													subWord = [];
-													subWord.push(boardTileArray[i][startX]);
-													while((boardTileArray[i][startX-subFront] != "em" && startX-subFront != 0) || (startX+subBack != 14 && boardTileArray[i][startX+subBack] != "em"))
-													{
-														if(startX - subFront >= 0 && boardTileArray[i][startX-subFront] == "lo")
-														{
-															subWord.unshift(boardArray[i][startX-subFront].stringData);
-															subFront++;
-														}
-														if(startX + subBack <= 14 && boardTileArray[i][startX+subBack] == "lo")
-														{
-															subWord.push(boardArray[i][startX+subBack].stringData);
-															subBack++;
-														}
-													}
-													if(!(wordDict.contains(subWord.join(""))))
-													{
-														trace("Some words were not found");
-														adjacentWords = 0;
-														infoBox.text = "The word "+subWord.join("")+" was not found. Please place another word and try again. Click anywhere to continue.";
-														readingText = 1;
-														addChild(infoBox);
-														break;
-													}
-												}
-											}
-										}
-										else
-										{
-											adjacentWords = 0;
-											infoBox.text = "The word "+word+" was not found. Please place another word and try again. Click anywhere to continue.";
-											readingText = 1;
-											addChild(infoBox);
-										}
-										if(adjacentWords != 1)
-										{
-											trace("Some of your words ain't right");
-										}
-										else
-										{
-											trace("GOOD TO GO, LOCK IN AND ROLL OUT");
-											turn++;
-											
-											//Check adjacent words FIRST
-											for(i = front; i < back; i++)
-											{
-												scoreChange = 0;
-												doubleWord = 0;
-												tripleWord  = 0; 
-												if(boardTileArray[i][startX] != "lo")
-												{
-													if ((startX < 14 && boardTileArray[i][startX+1] != "em") || (startY > 0 && boardTileArray[i][startX-1] != "em"))
-													{
-														subFront = 1;
-														subBack = 1;
-														if(boardSymbolArray[i][startX] == "dl")
-														{
-															scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData]*2;
-														}
-														else if(boardSymbolArray[i][startX] == "tl")
-														{
-															scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringdata]*3;
-														}
-														else if(boardSymbolArray[i][startX] == "dw")
-														{
-															scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
-															doubleWord++;
-														}
-														else if(boardSymbolArray[i][startX] == "tw")
-														{
-															scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
-															tripleWord++;
-														}
+					pressSubmitButton();																			
+					// TODO: You Won!!
+					
+				}
 														
-														while (boardTileArray[i][startX-subFront] != "em" || boardTileArray[i][startX+subBack] != "em")
-														{
-															trace(boardTileArray[i][startX-subFront],  boardTileArray[i][startX+subBack]);
-															if (startY - subFront >= 0 && boardTileArray[i][startX - subFront] == "lo")
-															{
-																scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
-																subFront++;
-															}
-															if (startY + subBack <= 14 && boardTileArray[i][startX+subBack] == "lo")
-															{
-																scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
-																subBack++;
-															}
-														}
-														if(doubleWord != 0)
-														{
-															playerScore = playerScore + scoreChange*(2*doubleWord);
-														}
-														else if (tripleWord != 0)
-														{
-															playerScore = playerScore + scoreChange*(3*tripleWord);
-														}
-														else
-														{
-															playerScore = playerScore + scoreChange;
-														}
-													}
-												}
-											}
-											scoreChange = 0;
-											doubleWord = 0;
-											tripleWord = 0; 
-											for(i = front; i <= back; i++)
-											{
-												boardArray[i][startX].valLock = 1;
-												boardTileArray[i][startX] = "lo";
-												trace(scoreDict[boardArray[i][startX].stringData]);
-												if(boardSymbolArray[i][startX] == "tl")
-												{
-													scoreChange = scoreChange + (scoreDict[boardArray[i][startX].stringData] * 3);
-												}
-												else if(boardSymbolArray[i][startX] == "dl")
-												{
-													scoreChange = scoreChange + (scoreDict[boardArray[i][startX].stringData] * 2);
-												}
-												else if(boardSymbolArray[i][startX] == "tw")
-												{
-													scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
-													tripleWord++;  
-												}
-												else if(boardSymbolArray[i][startX] == "dw")
-												{
-													scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
-													doubleWord++;
-												}
-												else
-												{
-													scoreChange = scoreChange + scoreDict[boardArray[i][startX].stringData];
-												}
-												boardSymbolArray[i][startX] = "em";
-											}
-											
-											if(tripleWord != 0)
-											{
-												playerScore = playerScore + (scoreChange*(3*tripleWord));
-											}
-											else if(doubleWord != 0)
-											{
-												playerScore = playerScore + (scoreChange*(2*doubleWord));
-											}
-											else
-											{
-												playerScore = playerScore + scoreChange;
-											}
-											
-											
-											
-											//Give the player new letters
-											for (i = 0; i < currentTiles.length; i++)
-											{
-												if (currentTiles[i].stringData == "empty")
-												{
-													randNum = Math.floor(Math.random() * alphabetArray.length);
-													currentTiles[i].stringData = alphabetArray[randNum];
-													alphabetArray.splice(randNum, 1);
-													currentTiles[i].gotoAndStop(currentTiles[i].stringData);
-												}
-											}
-											
-											scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
-											if(playerScore >= 150)
-											{
-												gameMode = 3;
-												infoBox.text = "You Won!!! Thank you for playing. Click anywhere to play again";
-												addChild(infoBox);
-												
-												//Might as well post stuff
-												variables = new URLVariables();
-												variables.debug = true;
-												variables.id = idArray[0];
-												variables.nonce = idArray[1];
-												variables.action = "submit";
-												variables["data[]"] = dataArray;
-												request = new URLRequest(WWF_URL);
-												request.data = variables;
-												request.method = URLRequestMethod.POST;
-										
-												loader = new URLLoader();
-												loader.addEventListener(Event.COMPLETE, completeHandler);
-										
-												loader.load(request);	
-												dataArray = [];
-											}
-											else
-											{
-												dataArray.push("New_Rack,"+currentTiles[0].stringData+","+currentTiles[1].stringData+","+currentTiles[2].stringData+","+currentTiles[3].stringData+","+currentTiles[4].stringData+","+currentTiles[5].stringData+","+currentTiles[6].stringData+","+getTimer());
-												computerGo();
-											}
-										}
-									}
-									else
-									{
-										trace("Invalid Configuration");
-										infoBox.text = "Invalid board configuration. Click anywhere to continue.";
-										addChild(infoBox);
-										readingText = 1;
-									}
-								}
-								else
-								{
-									trace("Stop trying to cheat");
-									infoBox.text = "Your word must go through at least one letter of a word that is already on the board. Click anywhere to continue.";
-									addChild(infoBox);
-									readingText = 1;
-								}
-							}
-						}
-					}
-					
-	
-				}
-			}
-			
+			} // What the heck is this closing? Swap mode?
 			else if(swappingTiles == 1 && gameMode == 1 && readingText == 0)
 			{
 				if(pressedSwapCancel == 1 && mouseY <= (35*15)-9 + OFFSET && mouseX >= 408 && mouseX <= 458 && mouseY >=(35*15)-49 + OFFSET)
@@ -1768,7 +1396,7 @@
 					{
 						if(currentSwapTiles[i].stringData != "empty")
 						{
-							for(j = 0; j < 7; j++)
+							for(var j:int = 0; j < 7; j++)
 							{
 								if(currentTiles[j].stringData == "empty")
 								{
@@ -1780,7 +1408,8 @@
 						}
 						//currentSwapTiles[i] = null;
 					}
-					//Remove buttons
+					
+					// Remove buttons
 					for(j = 0; j < 3; j++)
 					{
 						for (i = numChildren-1; i >= 0; i--)
@@ -1819,7 +1448,7 @@
 					{
 						if(currentTiles[i].stringData == "empty")
 						{
-							randNum = Math.floor(Math.random() * (alphabetArray.length));
+							var randNum = Math.floor(Math.random() * (alphabetArray.length));
 							currentTiles[i].stringData = alphabetArray[randNum];
 							alphabetArray.splice(randNum, 1);
 							currentTiles[i].gotoAndStop(currentTiles[i].stringData);
@@ -1865,15 +1494,16 @@
 					swapCancel = null;
 					swappingTiles = 0;
 					
+					// swap is like pass.. this code has to be redone
 					turn++;
 					if(turn == 1)
 					{
-						compositionCorrect= 0;
-						compositionCount= 0;
+						var compositionCorrect:int = 0;
+						var compositionCount:int = 0;
 						while(compositionCorrect == 0)
 						{
-							randWord = wordDict.random();
-							randWordArray = randWord.split("");
+							var randWord:String = wordDict.random();
+							var randWordArray:Array = randWord.split("");
 							for(i = 0; i < randWordArray.length; i++)
 							{
 								if(!(alphabetArray.indexOf(randWordArray[i]) > -1))
@@ -1888,8 +1518,8 @@
 							}
 						}
 						
-						scoreChange = 0;
-						doubleWord = 0; 
+						var scoreChange:int = 0;
+						var doubleWord:int = 0; 
 						for(i = 0; i < randWordArray.length; i++)
 						{
 							boardArray[7][i+7].stringData = randWordArray[i];
@@ -2068,7 +1698,9 @@
 				}
 				scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
 				removeChild(infoBox);
-			}
+			} // end else if gameMode = 3;
+			
+			
 			addEventListener(MouseEvent.MOUSE_DOWN, onClick);
 			startIndex = -1;
 			startXIndex = -1;
@@ -2078,12 +1710,15 @@
 			pressedSwap = 0;
 		}
 		
+		// This is the computer's turn.
 		public function computerGo():void
 		{
 			//Computer turns!! Only when the button is pressed. 
 			//Step 1, find available starting tiles
+
 			var totalSuccess:int = 0;
 			var candidateArray:Array = [];
+			
 			for(var i:int = 0; i < 15; i++)
 			{
 				for(var j:int = 0; j < 15; j++)
@@ -2343,7 +1978,7 @@
 										trace("Computer Score: "+computerScore);
 										scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
 										totalSuccess = 1;
-										if(computerScore >= 150)
+										if(computerScore >= POINTS_TO_WIN)
 										{
 											gameMode = 3;
 											infoBox.text = "The Computer won! Better luck next time. Click anywhere to play again!";
@@ -2494,7 +2129,7 @@
 										trace("Computer Score: "+computerScore);
 										scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
 										totalSuccess = 1;
-										if(computerScore >= 150)
+										if(computerScore >= POINTS_TO_WIN)
 										{
 											gameMode = 3;
 											infoBox.text = "The Computer won! Better luck next time. Click anywhere to play again!";
