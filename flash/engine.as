@@ -648,6 +648,7 @@
 			for (var i:int = 0; i < 15; i++) {
 				for (var j:int = 0; j < 15; j++) {
 					if (boardTileArray[i][j] == "lo") {
+						// TODO: Should boardArray be changed here as well?
 						boardSymbolArray[i][j] = "em";
 					}
 				}
