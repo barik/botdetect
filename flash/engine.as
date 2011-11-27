@@ -54,12 +54,15 @@
 		public var frameCount:int = 0;
 		public var dataArray:Array = [];
 		
+		// Increment this with new builds to avoid confusion between new and cached copies.
+		public static const VERSION:String = "ciigar scrabblesque, 1.1";
+		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
 		public static const POINTS_TO_WIN:int = 150;
 		
-		// public static const WWF_URL:String = "http://ciigar.csc.ncsu.edu/tbarik/wwf/wwf.php";
-		public static const WWF_URL:String = "http://localhost/wwf/wwf.php";
+		public static const WWF_URL:String = "http://ciigar.csc.ncsu.edu/tbarik/wwf/wwf.php";
+		// public static const WWF_URL:String = "http://localhost/wwf/wwf.php";
 		
 		// POST variables
 		public var variables:URLVariables;
@@ -256,6 +259,8 @@
 				"Remember that your words must use at least one letter from a word that already exists on the board. " + 
 				"The game will end when either you or the computer gets to " + POINTS_TO_WIN + " points. " + 
 				"Click anywhere to begin!";
+				
+			infoBox.text = infoBox.text + "\r\nVersion: " + VERSION;
 			
 			addChild(infoBox);
 			addEventListener(Event.ENTER_FRAME, onFrameEnter);
@@ -1683,8 +1688,8 @@
 		// This is the computer's turn.
 		public function computerGo():void
 		{
-			//Computer turns!! Only when the button is pressed. 
-			//Step 1, find available starting tiles
+			// Computer turns!! Only when the button is pressed. 
+			// Step 1, find available starting tiles
 
 			var totalSuccess:int = 0;
 			var candidateArray:Array = [];
@@ -1693,11 +1698,13 @@
 			{
 				for(var j:int = 0; j < 15; j++)
 				{
-					if(i == 0)
+					if (i == 0)
 					{
-						if(j == 0)
+						if (j == 0)
 						{
-							if(boardTileArray[i][j] == "lo" && ((boardTileArray[i][j+1] == "em" && boardTileArray[i+1][j+1] == "em") || (boardTileArray[i+1][j] == "em" && boardTileArray[i+1][j+1] == "em")))
+							if (boardTileArray[i][j] == "lo" && 
+								((boardTileArray[i][j+1] == "em" && boardTileArray[i+1][j+1] == "em") || 
+								 (boardTileArray[i+1][j] == "em" && boardTileArray[i+1][j+1] == "em")))
 							{
 								var tempArray:Array = [];
 								tempArray.push(i);
@@ -1707,7 +1714,9 @@
 						}
 						else if(j == 14)
 						{
-							if(boardTileArray[i][j] == "lo" && ((boardTileArray[i][j-1] == "em" && boardTileArray[i+1][j-1] == "em") || (boardTileArray[i+1][j] == "em" && boardTileArray[i+1][j-1] == "em")))
+							if(boardTileArray[i][j] == "lo" && 
+							   ((boardTileArray[i][j-1] == "em" && boardTileArray[i+1][j-1] == "em") || 
+								(boardTileArray[i+1][j] == "em" && boardTileArray[i+1][j-1] == "em")))
 							{
 								tempArray = [];
 								tempArray.push(i);
@@ -1723,7 +1732,7 @@
 							candidateArray.push(tempArray);
 						}  
 					}
-					else if(i == 14)
+					else if (i == 14)
 					{
 						if(j == 0)
 						{
@@ -1782,8 +1791,8 @@
 					}
 				}
 			}
-			if(candidateArray.length == 0)
-			{
+			
+			if (candidateArray.length == 0) {
 				trace("The Computer Passes");
 				infoBox.text = "The Computer Passes. Click Anywhere to Continue.";
 				readingText = 1;
@@ -1791,6 +1800,8 @@
 				totalSuccess = 1;
 				turn++;
 			}
+			
+			
 			trace(candidateArray);
 			var timesUp:int = 0;
 			var startTime = getTimer();
@@ -1800,7 +1811,7 @@
 				{
 					timesUp = 1;
 				}
-				//Let's find our word
+				//Let's find our word TODO use existing function
 				var randWord:String;
 				randWord = wordDict.random();
 				trace(randWord);
@@ -1815,6 +1826,7 @@
 						break;
 					}
 				}
+				
 				if(timesUp)
 				{
 					infoBox.text = "The computer passes. Click Anywhere to continue.";
