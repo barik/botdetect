@@ -286,7 +286,7 @@
 		 * must be adjacent to an already locked tile.
 		 */
 		private function hasAdjacent(x:int, y:int): Boolean {
-									
+															
 			if (x + 1 < 15 && boardTileArray[x + 1][y] == "lo") return true;
 			else if (x - 1 > 0 && boardTileArray[x - 1][y] == "lo") return true;
 			else if (y + 1 < 15 && boardTileArray[x][y + 1] == "lo") return true;
@@ -323,7 +323,7 @@
 						
 			trace("Performing linear tiles test with firstTurn: " +firstTurn);
 						
-			var horizontal:Boolean = false;
+			var horiz:Boolean = false;
 			var vertical:Boolean = false;
 			
 			var location:Array = findHighestTile();
@@ -342,15 +342,21 @@
 			// end of this loop will give us a starting and ending
 			// range.
 			for (var i:int = startX; i < 15; i++) {
-				for (var j:int = startY + 1; j < 15; j++) {
-					if (isUnlockedTile(i, j)) {												
+				for (var j:int = startY; j < 15; j++) {
+															
+					// Determine unlocked tile, but ignore the highest priority
+					// tile. Otherwise, you will set horizontal or vertical
+					// with itself.
+					if (isUnlockedTile(i, j) && !((i == startX) && (j == startY))) {												
+						
+						// trace("Unlocked tile: (" + i + "," + j + ")."); 
 						
 						if (startX == i && !vertical) {							
 							endX = i;
 							endY = j;							
-							horizontal = true;
+							horiz = true;
 						}						
-						else if (startY == j && !horizontal) {
+						else if (startY == j && !horiz) {
 							endX = i;
 							endY = j;							
 							vertical = true;
@@ -367,13 +373,20 @@
 				}
 			} // end for
 			
+			trace("The word is horizontal: " + horiz);
+			trace("The word is vertical: " + vertical);
+			
 			var hasAdjacentLocked:Boolean = false;
 			
 			// Using the horizontal flag, do a final pass to make sure 
 			// that the tiles are contiguous.			
-			if (horizontal) {				
+			if (horiz) {				
 				for (j = startY; j <= endY; j++) {
-					if (boardTileArray[startX][j] == "em") {						
+					if (boardTileArray[startX][j] == "em") {
+						
+						trace("Board tile is empty at: (" + i + "," + startX +
+							  ") for " + boardTileArray[startX][j]);
+						
 						return false;
 					} 
 					
@@ -382,7 +395,11 @@
 			}
 			else {
 				for (i = startX; i <= endX; i++) {
-					if (boardTileArray[i][startY] == "em") {						
+					if (boardTileArray[i][startY] == "em") {	
+					
+						trace("Board tile is empty at: (" + i + "," + startY +
+							  ") for "+ boardTileArray[i][startY]);
+						
 						return false;
 					}
 					
@@ -403,6 +420,7 @@
 				addChild(infoBox);
 				readingText = 1;
 			
+				trace("Adjacent tile was not locked.");
 				return false;
 			}
 		}
@@ -948,6 +966,10 @@
 			// Calculate the player's score.
 			playerScore += calculatePlayerScore(wordLines);
 			
+			trace("Player Score: " + playerScore);
+			trace("Computer Score: "+ computerScore);
+			scoreBox.text = "Player: " + playerScore + "				Computer: " + computerScore;
+			
 			if(playerScore >= POINTS_TO_WIN) {
 				gameMode = 3;
 				infoBox.text = "You Won! Thank you for playing. Click anywhere to play again";
@@ -978,10 +1000,6 @@
 
 			// Refill the rack.
 			refillRack();				
-
-			trace("Player Score: " + playerScore);
-			trace("Computer Score: "+ computerScore);
-			scoreBox.text = "Player: " + playerScore + "				Computer: " + computerScore;
 		
 			turn++;										
 			computerGo();
