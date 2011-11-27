@@ -945,10 +945,15 @@
 			trace("Verifying tiles at turn " + turn + ".");
 			
 			if (!verifyTurn(turn == 0)) {
-				trace("Invalid Board Configuration");
-				infoBox.text = "Invalid board configuration. Click anywhere to continue.";
-				addChild(infoBox);
-				readingText = 1;
+
+				// Use this generic message if a more specific message
+				// has not already been set.
+				if (readingText != 1) {
+					trace("Invalid Board Configuration");
+					infoBox.text = "Invalid board configuration. Click anywhere to continue.";
+					addChild(infoBox);
+					readingText = 1;
+				}
 				return;
 			}					
 								
