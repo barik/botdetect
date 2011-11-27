@@ -12,6 +12,14 @@
 			return words.indexOf(word.toLowerCase()) > -1;
 		}
 		
+		public function dictionarySize():int {
+			return words.length;
+		}
+		
+		public function getWordAt(position:int):String {
+			return words[position];
+		}
+		
 		public function random():String {
 			
 			var tempString:String;
