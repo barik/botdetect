@@ -74,6 +74,6 @@ reached using Google Talk at the same address.</p>
 <hr />
 
 <p>
-<img src="CIIGARLABcoloronwhite.gif"  style="width:40%"
+<img src="CIIGARLABcoloronwhite.gif"  style="width:150px"
 	alt="NC State University: Department of Computer Science" />
 </p>
