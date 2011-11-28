@@ -55,7 +55,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "ciigar scrabblesque, 1.1";
+		public static const VERSION:String = "ciigar scrabblesque, 1.2";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -1816,15 +1816,10 @@
 				randWord = wordDict.random();
 				trace(randWord);
 				var randWordArray:Array = randWord.split("");
-				var compositionCorrect = 1;
-				//check and see if this word can even be made (does it have letters in alphabetArray)
-				for(i = 0; i< randWordArray.length; i++)
-				{
-					if(!(alphabetArray.indexOf(randWordArray[i]) > -1))
-					{
-						compositionCorrect = 0;
-						break;
-					}
+				var compositionCorrect = 0;
+				
+				if (areLettersAvailable(randWord)) {
+					compositionCorrect = 1;
 				}
 				
 				if(timesUp)
