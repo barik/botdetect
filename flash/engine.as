@@ -1928,7 +1928,10 @@
 										var tripleWord:int = 0;
 										for(k = 0; k < (randWordArray.length); k++)
 										{
-											alphabetArray.splice(alphabetArray.indexOf(randWordArray[k]),1);
+											if(boardTileArray[k + candidateArray[i][0]-j][candidateArray[i][1]] != "lo")
+											{
+												alphabetArray.splice(alphabetArray.indexOf(randWordArray[k]),1);
+											}
 											boardTileArray[k + candidateArray[i][0]-j][candidateArray[i][1]] = "lo";
 											boardArray[k + candidateArray[i][0]-j][candidateArray[i][1]].stringData = randWordArray[k];
 											boardArray[k + candidateArray[i][0]-j][candidateArray[i][1]].valLock = 1;
@@ -2079,7 +2082,10 @@
 										//Proceed to the next check, if there are letters above or below...wait...we did that above, WINNER!
 										for(k = 0; k < randWordArray.length; k++)
 										{
-											alphabetArray.splice(alphabetArray.indexOf(randWordArray[k]),1);
+											if(boardTileArray[candidateArray[i][0]][k+candidateArray[i][1]-j] != "lo")
+											{
+												alphabetArray.splice(alphabetArray.indexOf(randWordArray[k]),1);
+											}
 											boardTileArray[candidateArray[i][0]][k+candidateArray[i][1]-j] = "lo";
 											boardArray[candidateArray[i][0]][k+candidateArray[i][1]-j].stringData = randWordArray[k];
 											boardArray[candidateArray[i][0]][k+candidateArray[i][1]-j].valLock = 1;
