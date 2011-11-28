@@ -282,7 +282,7 @@
 					// Compress them by not adding a Mouse_Position
 					// unless it is actually different from the previous position.
 					if (last[0] == "Mouse_Position" && 
-						(last[1] != mouseX || last[2] != mouseY) {
+						(last[1] != mouseX || last[2] != mouseY)) {
 											
 							dataArray.push("Mouse_Position,"+mouseX+","+mouseY+","+getTimer());
 					}					
