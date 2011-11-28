@@ -61,8 +61,8 @@
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
 		public static const POINTS_TO_WIN:int = 150;
 		
-		public static const WWF_URL:String = "http://ciigar.csc.ncsu.edu/tbarik/wwf/wwf.php";
-		// public static const WWF_URL:String = "http://localhost/wwf/wwf.php";
+		// public static const WWF_URL:String = "http://ciigar.csc.ncsu.edu/tbarik/wwf/wwf.php";
+		public static const WWF_URL:String = "http://localhost/wwf/wwf.php";
 		
 		// POST variables
 		public var variables:URLVariables;
@@ -271,17 +271,32 @@
 
 		public function onFrameEnter(e:Event=null):void
 		{
-			if(frameCount % 6 == 0)
-			{
-				dataArray.push("Mouse_Position,"+mouseX+","+mouseY+","+getTimer());
+						
+			if (frameCount % 6 == 0) {
+				
+				if (dataArray.length > 0) {
+				
+					var last:Array = dataArray[dataArray.length - 1].split(",");				
+					
+					// Mouse position events occur extremely frequently.
+					// Compress them by not adding a Mouse_Position
+					// unless it is actually different from the previous position.
+					if (last[0] == "Mouse_Position" && 
+						(last[1] != mouseX || last[2] != mouseY) {
+											
+							dataArray.push("Mouse_Position,"+mouseX+","+mouseY+","+getTimer());
+					}					
+				}
+								
 			}
-			for (var i:int = numChildren-1; i >= 0; i--)
-			{
-				if (getChildAt(i) is letters)
-				{
+			
+			for (var i:int = numChildren-1; i >= 0; i--) {
+				if (getChildAt(i) is letters) {
 					MovieClip(getChildAt(i)).onFrameEnters();
 				}
 			}
+						
+			frameCount++;
 			frameCount = frameCount % 6;
 		}
 		
