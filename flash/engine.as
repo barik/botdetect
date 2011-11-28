@@ -1093,6 +1093,10 @@
 			
 			// Place the tiles for the selected word on the board.
 			for (var i:int = 0; i < randWordArray.length; ++i) {
+				
+				// Remove the tile from the unused tile bag.
+				alphabetArray.splice(alphabetArray.indexOf(randWordArray[i]), 1);
+				
 				boardTileArray[7][i+7] = randWordArray[i];
 				boardArray[7][i+7].stringData = randWordArray[i];
 				boardArray[7][i+7].gotoAndStop(boardArray[7][i+7].stringData);				
