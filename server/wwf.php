@@ -43,6 +43,8 @@ if ($action == 'new') {
 	
 	# Game Version
 	$client_version = $_REQUEST['client_version'];
+	$http_referer = isset($_SERVER['HTTP_REFERER']) ? 
+		$_SERVER['HTTP_REFERER'] : "";
 	
 	# Adobe Flash Variables
 	$avHardwareDisable = $_REQUEST['AVD'];
@@ -109,17 +111,18 @@ if ($action == 'new') {
 			version, 		
 			windowlessMode, 
 			uagent,
-			client_version)
+			client_version,
+			http_referer)
 		VALUES (
 			INET_ATON(?), ?, 
 			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
 			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-			?, ?, ?, ?, ?, ?, ?, ?, ?, ?		
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?		
 		)
 ";
 	
 	$stmt = $mysqli->prepare($sql);
-	$stmt->bind_param("ssssssssssssssssssssssssssssssss", 
+	$stmt->bind_param("sssssssssssssssssssssssssssssssss", 
 		$ip, 
 		$nonce,
 		$avHardwareDisable, 
@@ -151,7 +154,8 @@ if ($action == 'new') {
 		$version,		
 		$windowlessMode,
 		$uagent,
-		$client_version
+		$client_version,
+		$http_referer
 	);
 	
 	$stmt->execute();
