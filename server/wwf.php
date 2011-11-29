@@ -50,7 +50,7 @@ if ($action == 'new') {
 	$hasAudio	= $_REQUEST['A'];
 	$hasAudioEncoder = $_REQUEST['AE'];
 	$hasEmbeddedVideo	= $_REQUEST['EV'];
-	$hasIME	= $_REQUEST['IME'];
+	$hasIME	= isset($_REQUEST['IME']) ? $_REQUEST['IME'] : "f";
 	$hasMP3	= $_REQUEST['MP3'];
 	$hasPrinting = $_REQUEST['PR'];
 	$hasScreenBroadcast =	$_REQUEST['SB'];
