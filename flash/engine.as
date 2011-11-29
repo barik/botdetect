@@ -666,8 +666,8 @@
 					else if (boardSymbolArray[i][j] == "dw") {
 						doubleWord++;
 					}
-					else if (boardSymbolArray[i][j] == "dw") {
-						doubleWord++;
+					else if (boardSymbolArray[i][j] == "tw") {
+						tripleWord++;
 					}
 				
 					trace("letterScore = " + letter + " " +  letterScore);
