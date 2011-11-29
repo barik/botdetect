@@ -38,10 +38,11 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : NULL;
 if ($action == 'new') {
 
 	$ip = $_SERVER['REMOTE_ADDR'];
-	$uagent = $_SERVER['HTTP_USER_AGENT'];
+	$uagent = $_SERVER['HTTP_USER_AGENT'];	
 	$nonce = sha1($session_key .  rand() . $ip);
 	
-	echo $uagent;
+	# Game Version
+	$client_version = $_REQUEST['client_version'];
 	
 	# Adobe Flash Variables
 	$avHardwareDisable = $_REQUEST['AVD'];
@@ -107,17 +108,18 @@ if ($action == 'new') {
 			screenResolutionY, 
 			version, 		
 			windowlessMode, 
-			uagent) 
+			uagent,
+			client_version)
 		VALUES (
 			INET_ATON(?), ?, 
 			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
 			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-			?, ?, ?, ?, ?, ?, ?, ?, ?		
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?		
 		)
 ";
 	
 	$stmt = $mysqli->prepare($sql);
-	$stmt->bind_param("sssssssssssssssssssssssssssssss", 
+	$stmt->bind_param("ssssssssssssssssssssssssssssssss", 
 		$ip, 
 		$nonce,
 		$avHardwareDisable, 
@@ -148,7 +150,8 @@ if ($action == 'new') {
 		$screenResolutionY, 
 		$version,		
 		$windowlessMode,
-		$uagent
+		$uagent,
+		$client_version
 	);
 	
 	$stmt->execute();

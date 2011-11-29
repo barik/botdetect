@@ -56,7 +56,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "ciigar scrabblesque, 1.5";
+		public static const VERSION:String = "1.5";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -163,10 +163,10 @@
 			
 			/* Login */
 			trace(Capabilities.serverString);
-			
-			
-			variables = new URLVariables();
+						
+			variables = new URLVariables();			
 			variables.decode(Capabilities.serverString);
+			variables.client_version = VERSION;
 			variables.action = "new";
 			var request:URLRequest = new URLRequest(WWF_URL);
 			request.data = variables;
