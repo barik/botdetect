@@ -56,7 +56,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "1.5";
+		public static const VERSION:String = "1.6";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -289,8 +289,9 @@
 					// Mouse position events occur extremely frequently.
 					// Compress them by not adding a Mouse_Position
 					// unless it is actually different from the previous position.
-					if (last[0] == "Mouse_Position" && 
-						(last[1] != mouseX || last[2] != mouseY)) {
+					if (last[0] != "Mouse_Position" || 
+						(last[0] == "Mouse_Position" && 
+						 	(last[1] != mouseX || last[2] != mouseY))) {
 											
 							dataArray.push("Mouse_Position,"+mouseX+","+mouseY+","+getTimer());
 					}					
