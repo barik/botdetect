@@ -56,7 +56,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "1.7";
+		public static const VERSION:String = "1.8";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -560,7 +560,7 @@
 					}
 					
 					// Expand horizontally, since vertical has already been expanded.
-					if (isUnlockedTile(i, j) && i == highY) {
+					if (isUnlockedTile(i, j) && j == highY) {
 						
 						horizontalWord = expandHorizontal(i, j);						
 						if (horizontalWord) {							
@@ -593,8 +593,11 @@
 		
 		function refillRack() {
 			
-			// TODO: Take all when rack needs more tiles than we actually have.
-			
+			// TODO: We're completely out of tiles. Now what?
+			if (alphabetArray.length == 0) {
+				return;
+			}
+						
 			// Refill the player's rack.
 			for (var i:int = 0; i < currentTiles.length; i++) {
 				if (currentTiles[i].stringData == "empty") {
