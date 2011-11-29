@@ -56,14 +56,14 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "ciigar scrabblesque, 1.4";
+		public static const VERSION:String = "ciigar scrabblesque, 1.5";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
 		public static const POINTS_TO_WIN:int = 150;
 		
-		// public static const WWF_URL:String = "http://ciigar.csc.ncsu.edu/tbarik/wwf/wwf.php";
-		public static const WWF_URL:String = "http://localhost/wwf/wwf.php";
+		public static const WWF_URL:String = "http://ciigar.csc.ncsu.edu/tbarik/wwf/wwf.php";
+		//public static const WWF_URL:String = "http://localhost/wwf/wwf.php";
 		
 		// POST variables
 		public var variables:URLVariables;
@@ -141,6 +141,9 @@
 
 		public function loginHandler(event:Event)
 		{
+			
+			trace(event.target.data);
+			
 			idArray = event.target.data.replace(/result=/,"").split(",");
 			var lastDitchArray:Array = [];
 			for(var i:int = 0; i < idArray[1].length; i++)

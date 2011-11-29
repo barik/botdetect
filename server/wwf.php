@@ -38,7 +38,10 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : NULL;
 if ($action == 'new') {
 
 	$ip = $_SERVER['REMOTE_ADDR'];
+	$uagent = $_SERVER['HTTP_USER_AGENT'];
 	$nonce = sha1($session_key .  rand() . $ip);
+	
+	echo $uagent;
 	
 	# Adobe Flash Variables
 	$avHardwareDisable = $_REQUEST['AVD'];
@@ -103,17 +106,18 @@ if ($action == 'new') {
 			screenResolutionX, 
 			screenResolutionY, 
 			version, 		
-			windowlessMode) 
+			windowlessMode, 
+			uagent) 
 		VALUES (
 			INET_ATON(?), ?, 
 			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
 			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-			?, ?, ?, ?, ?, ?, ?, ?		
+			?, ?, ?, ?, ?, ?, ?, ?, ?		
 		)
 ";
 	
 	$stmt = $mysqli->prepare($sql);
-	$stmt->bind_param("ssssssssssssssssssssssssssssss", 
+	$stmt->bind_param("sssssssssssssssssssssssssssssss", 
 		$ip, 
 		$nonce,
 		$avHardwareDisable, 
@@ -143,7 +147,8 @@ if ($action == 'new') {
 		$screenResolutionX, 
 		$screenResolutionY, 
 		$version,		
-		$windowlessMode
+		$windowlessMode,
+		$uagent
 	);
 	
 	$stmt->execute();

@@ -117,8 +117,9 @@ CREATE TABLE `users` (
   `screenResolutionY` varchar(32) DEFAULT NULL,
   `version` varchar(32) DEFAULT NULL,
   `windowlessMode` varchar(32) DEFAULT NULL,
+  `uagent` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=159 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=162 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -147,4 +148,4 @@ CREATE TABLE `word_events` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-11-28 19:55:06
+-- Dump completed on 2011-11-28 20:12:46
