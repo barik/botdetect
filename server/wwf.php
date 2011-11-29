@@ -40,9 +40,112 @@ if ($action == 'new') {
 	$ip = $_SERVER['REMOTE_ADDR'];
 	$nonce = sha1($session_key .  rand() . $ip);
 	
-	$sql = "INSERT INTO users (ip_address, nonce) VALUES (INET_ATON(?), ?)";
+	# Adobe Flash Variables
+	$avHardwareDisable = $_REQUEST['AVD'];
+	$hasAccessibility	= $_REQUEST['ACC'];
+	$hasAudio	= $_REQUEST['A'];
+	$hasAudioEncoder = $_REQUEST['AE'];
+	$hasEmbeddedVideo	= $_REQUEST['EV'];
+	$hasIME	= $_REQUEST['IME'];
+	$hasMP3	= $_REQUEST['MP3'];
+	$hasPrinting = $_REQUEST['PR'];
+	$hasScreenBroadcast =	$_REQUEST['SB'];
+	$hasScreenPlayback = $_REQUEST['SP'];
+	$hasStreamingAudio = $_REQUEST['SA'];
+	$hasStreamingVideo = $_REQUEST['SV'];
+	$hasTLS	= $_REQUEST['TLS'];
+	$hasVideoEncoder = $_REQUEST['VE'];
+	$isDebugger	= $_REQUEST['DEB'];
+	$language	= $_REQUEST['L'];
+	$localFileReadDisable =	$_REQUEST['LFD'];
+	$manufacturer	= $_REQUEST['M'];
+	$maxLevelIDC = $_REQUEST['ML'];
+	$os = $_REQUEST['OS'];
+	$pixelAspectRatio = $_REQUEST['AR'];
+	$playerType = $_REQUEST['PT'];
+	$screenColor = $_REQUEST['COL'];
+	$screenDPI = $_REQUEST['DP'];
+	$screenResolutionX = $_REQUEST['R'];
+	$screenResolutionY = $_REQUEST['R'];
+	$version = $_REQUEST['V'];		
+	$windowlessMode = $_REQUEST['WD'];
+		
+	
+	$sql = "
+	INSERT INTO users 
+		(
+			ip_address, 
+			nonce, 
+			avHardwareDisable, 
+			hasAccessibility, 
+			hasAudio, 
+			hasAudioEncoder, 
+			hasEmbeddedVideo, 
+			hasIME, 
+			hasMP3, 
+			hasPrinting, 
+			hasScreenBroadcast, 
+			hasScreenPlayback, 
+			hasStreamingAudio, 
+			hasStreamingVideo, 
+			hasTLS, 
+			hasVideoEncoder, 
+			isDebugger, 
+			language, 
+			localFileReadDisable, 
+			manufacturer, 
+			maxLevelIDC, 
+			os, 
+			pixelAspectRatio, 
+			playerType, 
+			screenColor, 
+			screenDPI, 
+			screenResolutionX, 
+			screenResolutionY, 
+			version, 		
+			windowlessMode) 
+		VALUES (
+			INET_ATON(?), ?, 
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+			?, ?, ?, ?, ?, ?, ?, ?		
+		)
+";
+	
 	$stmt = $mysqli->prepare($sql);
-	$stmt->bind_param("ss", $ip, $nonce);
+	$stmt->bind_param("ssssssssssssssssssssssssssssss", 
+		$ip, 
+		$nonce,
+		$avHardwareDisable, 
+		$hasAccessibility, 
+		$hasAudio, 
+		$hasAudioEncoder, 
+		$hasEmbeddedVideo, 
+		$hasIME, 
+		$hasMP3, 
+		$hasPrinting, 
+		$hasScreenBroadcast, 
+		$hasScreenPlayback, 
+		$hasStreamingAudio, 
+		$hasStreamingVideo, 
+		$hasTLS, 
+		$hasVideoEncoder, 
+		$isDebugger, 
+		$language, 
+		$localFileReadDisable, 
+		$manufacturer, 
+		$maxLevelIDC, 
+		$os, 
+		$pixelAspectRatio, 
+		$playerType, 
+		$screenColor, 
+		$screenDPI, 
+		$screenResolutionX, 
+		$screenResolutionY, 
+		$version,		
+		$windowlessMode
+	);
+	
 	$stmt->execute();
 	$stmt->close();
 	

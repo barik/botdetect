@@ -89,8 +89,36 @@ CREATE TABLE `users` (
   `nonce` varchar(40) NOT NULL,
   `is_expired` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `avHardwareDisable` varchar(1) DEFAULT NULL,
+  `hasAccessibility` varchar(1) DEFAULT NULL,
+  `hasAudio` varchar(1) DEFAULT NULL,
+  `hasAudioEncoder` varchar(1) DEFAULT NULL,
+  `hasEmbeddedVideo` varchar(1) DEFAULT NULL,
+  `hasIME` varchar(1) DEFAULT NULL,
+  `hasMP3` varchar(1) DEFAULT NULL,
+  `hasPrinting` varchar(1) DEFAULT NULL,
+  `hasScreenBroadcast` varchar(1) DEFAULT NULL,
+  `hasScreenPlayback` varchar(1) DEFAULT NULL,
+  `hasStreamingAudio` varchar(1) DEFAULT NULL,
+  `hasStreamingVideo` varchar(1) DEFAULT NULL,
+  `hasTLS` varchar(1) DEFAULT NULL,
+  `hasVideoEncoder` varchar(1) DEFAULT NULL,
+  `isDebugger` varchar(1) DEFAULT NULL,
+  `language` varchar(32) DEFAULT NULL,
+  `localFileReadDisable` varchar(1) DEFAULT NULL,
+  `manufacturer` varchar(32) DEFAULT NULL,
+  `maxLevelIDC` varchar(32) DEFAULT NULL,
+  `os` varchar(32) DEFAULT NULL,
+  `pixelAspectRatio` varchar(32) DEFAULT NULL,
+  `playerType` varchar(32) DEFAULT NULL,
+  `screenColor` varchar(32) DEFAULT NULL,
+  `screenDPI` varchar(32) DEFAULT NULL,
+  `screenResolutionX` varchar(32) DEFAULT NULL,
+  `screenResolutionY` varchar(32) DEFAULT NULL,
+  `version` varchar(32) DEFAULT NULL,
+  `windowlessMode` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=159 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -119,4 +147,4 @@ CREATE TABLE `word_events` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-11-22  9:20:33
+-- Dump completed on 2011-11-28 19:55:06
