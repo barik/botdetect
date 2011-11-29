@@ -56,7 +56,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "1.8";
+		public static const VERSION:String = "1.9";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -546,8 +546,13 @@
 				}
 			}
 			
-			for (var i:int = highX + 1; i < 15; ++i) {
+			for (var i:int = highX; i < 15; ++i) {
 				for (var j:int = highY; j < 15; ++j) {
+					
+					/* This is the highest tile. Ignore it and move on. */
+					if (i == highX && j == highY) {
+						continue;
+					}
 										
 					// Expand vertically, since horizontal has already been expanded.
 					if (isUnlockedTile(i,j) && i == highX) {
