@@ -56,7 +56,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "1.6";
+		public static const VERSION:String = "1.7";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -185,7 +185,9 @@
 			scoreBox.height = OFFSET;
 			scoreBox.width = 525;
 			scoreBox.defaultTextFormat = scoreFormat;
-			scoreBox.text = "Player: 0				Computer: 0";
+			
+			displayScore();
+			
 			addChild(scoreBox);
 			wordDict = new wordDictionary();
 			
@@ -307,6 +309,12 @@
 						
 			frameCount++;
 			frameCount = frameCount % 6;
+		}
+		
+		public function displayScore() {
+			trace("Player Score: " + playerScore);
+			trace("Computer Score: "+ computerScore);
+			scoreBox.text = "Player: " + playerScore + "          " + "Computer: " + computerScore;			
 		}
 		
 		/** 
@@ -1000,9 +1008,8 @@
 			// Calculate the player's score.
 			playerScore += calculatePlayerScore(wordLines);
 			
-			trace("Player Score: " + playerScore);
-			trace("Computer Score: "+ computerScore);
-			scoreBox.text = "Player: " + playerScore + "				Computer: " + computerScore;
+			// Display their score in the scoreBox.
+			displayScore();			
 			
 			if(playerScore >= POINTS_TO_WIN) {
 				gameMode = 3;
@@ -1124,9 +1131,7 @@
 			// Remove bonus tiles.
 			clearBonusTiles();
 			
-			trace("Player Score: " + playerScore);
-			trace("Computer Score: " + computerScore);
-			scoreBox.text = "Player: " + playerScore + "				Computer: "+computerScore;
+			displayScore();			
 			
 		}
 		
@@ -1699,7 +1704,8 @@
 					alphabetArray.splice(randNum, 1);
 					currentTiles[i].gotoAndStop(currentTiles[i].stringData);
 				}
-				scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
+				
+				displayScore();
 				removeChild(infoBox);
 			} // end else if gameMode = 3;
 			
@@ -1982,9 +1988,9 @@
 										{
 											computerScore = computerScore + scoreChange;
 										}
-										trace("Player Score: "+playerScore);
-										trace("Computer Score: "+computerScore);
-										scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
+										
+										displayScore();
+										
 										totalSuccess = 1;
 										if(computerScore >= POINTS_TO_WIN)
 										{
@@ -2137,9 +2143,8 @@
 											computerScore = computerScore + scoreChange;
 										}
 										
-										trace("Player Score: "+playerScore);
-										trace("Computer Score: "+computerScore);
-										scoreBox.text = "Player: "+playerScore+"				Computer: "+computerScore;
+										displayScore();
+										
 										totalSuccess = 1;
 										if(computerScore >= POINTS_TO_WIN)
 										{
