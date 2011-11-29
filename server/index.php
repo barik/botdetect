@@ -15,7 +15,7 @@
 
 <p>We are researchers at <a href="http://www.ncsu.edu">North Carolina State 
 University</a>. Help participate in research by spending a few minutes or more 
-playing a variation of a popular online game, Words with Friends. Playing our 
+playing a variation of a popular online game, Scrabble. Playing our 
 game will help us improve the design of games in many areas, including 
 usability, interaction, and artificial intelligence. </p>
 
@@ -58,8 +58,9 @@ usability, interaction, and artificial intelligence. </p>
 <hr />
 
 <p>The game is completely free to play, and no personally identifiable 
-information will be collected. In addition, no events or actions that occur 
-outside of the Flash game environment will be recorded.</p>
+information will be collected. In addition, with the exception of Capabilities, 
+no events or actions that occur outside of the Flash game environment will be 
+recorded.</p>
 
 <p>This game will collect information about your in-game actions anonymously. 
 Consequently, <strong>you must be 18 or older and be willing to allow us to 
@@ -68,7 +69,7 @@ to the conditions, you may begin playing the game right away!</p>
 
 <p> If you have any questions about the study, please feel free to contact the 
 principal investigators, <a href="mailto:tbarik@ncsu.edu">Titus Barik</a>, or 
-<a href="mailto:tbarik@ncsu.edu">Brent Harrison</a>. Titus can also be 
+<a href="mailto:beharri5@ncsu.edu">Brent Harrison</a>. Titus can also be 
 reached using Google Talk at the same address.</p>
 
 <hr />
