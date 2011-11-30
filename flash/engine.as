@@ -56,7 +56,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "1.10";
+		public static const VERSION:String = "1.11";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -325,9 +325,9 @@
 		private function hasAdjacent(x:int, y:int): Boolean {
 															
 			if (x + 1 < 15 && boardTileArray[x + 1][y] == "lo") return true;
-			else if (x - 1 > 0 && boardTileArray[x - 1][y] == "lo") return true;
+			else if (x - 1 >= 0 && boardTileArray[x - 1][y] == "lo") return true;
 			else if (y + 1 < 15 && boardTileArray[x][y + 1] == "lo") return true;
-			else if (y - 1 > 0 && boardTileArray[x][y - 1] == "lo") return true;
+			else if (y - 1 >= 0 && boardTileArray[x][y - 1] == "lo") return true;
 			else return false;
 		}
 		
