@@ -1,0 +1,2 @@
+X coordinates mean squared error: 58.7971213655
+Y coordinates mean squared error: 10.034644872
