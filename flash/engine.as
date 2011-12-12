@@ -56,7 +56,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "1.11";
+		public static const VERSION:String = "1.12";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -791,7 +791,7 @@
 					var index:int = -1;
 					
 					// User pressed the enter button.
-					if (mouseX >=10 && mouseX <=60)
+					if (mouseX >= 10 && mouseX <= 59)
 					{
 						pressedEnter = 1;
 						removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
@@ -807,7 +807,7 @@
 					}
 					
 					// User pressed the swap button.
-					else if(mouseX >= 408 && mouseX <= 458)
+					else if(mouseX >= 408 && mouseX <= 457)
 					{
 						pressedSwap = 1;
 						removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
@@ -815,7 +815,7 @@
 					}		
 					
 					// User pressed the pass button.
-					else if(mouseX >= 466 && mouseX <= 516)
+					else if(mouseX >= 466 && mouseX <= 515)
 					{
 						pressedPass = 1;
 						removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
@@ -890,7 +890,7 @@
 			else if(gameMode == 1 && readingText == 0 && swappingTiles == 1 && mouseY >=(35*15)-49 + OFFSET && mouseY <= 35*15+48 + OFFSET)
 			{
 				//We'll do pressing the cancel on the swap thing for now
-				if(mouseY <= (35*15)-9 + OFFSET && mouseX >= 408 && mouseX <= 458)
+				if(mouseY <= (35*15)-9 + OFFSET && mouseX >= 408 && mouseX <= 457)
 				{
 					pressedSwapCancel = 1;
 					removeEventListener(MouseEvent.MOUSE_DOWN, onClick);
