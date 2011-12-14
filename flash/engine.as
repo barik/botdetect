@@ -56,7 +56,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "1.12";
+		public static const VERSION:String = "1.13";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -1405,11 +1405,23 @@
 					newLetter = null;
 				}
 				
-				else if (pressedShuffle == 1 && mouseY >=35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >= 68 && mouseX <=117) {
+				// The player has hit the shuffle button (unclick).
+				else if (pressedShuffle == 1 && 
+						 mouseY >=35*15+8 + OFFSET && 
+						 mouseY <= 35*15+48 + OFFSET && 
+						 mouseX >= 68 && 
+						 mouseX <= 117) {
+					
 					pressShuffleButton();
 								
 				}
-				else if (pressedSwap == 1 && mouseY >= 35*15+8 + OFFSET && mouseY <= 35*15+48 + OFFSET && mouseX >= 408 && mouseX <= 458)
+				
+				// The player has hit the pass button (unclick).
+				else if (pressedSwap == 1 && 
+						 mouseY >= 35*15+8 + OFFSET && 
+						 mouseY <= 35*15+48 + OFFSET && 
+						 mouseX >= 408 && 
+						 mouseX <= 457)
 				{
 					//load up our swap thing and probably set a swapping tiles flag that will negate a LOT of things
 					var swapBar:swapFrame = new swapFrame();
@@ -1438,7 +1450,7 @@
 					trace("Entering Swap Tiles Mode");
 				}
 				
-				// The player has hit the pass button.
+				// The player has hit the pass button (unclick).
 				else if(pressedPass == 1 && mouseY>= 35*15+8 + OFFSET && 
 						mouseY <= 35*15+48 + OFFSET && 
 						mouseX >= 466 && mouseX <= 516) {
@@ -1447,10 +1459,12 @@
 					
 				}
 				
-				// The player has hit the submit button.
-				else if (pressedEnter == 1 && mouseY >= 35*15+8 + OFFSET && 
-						 mouseY <= 35*15+48 + OFFSET && mouseX >=10 && 
-						 mouseX <=60) {					
+				// The player has hit the submit button (unclick).
+				else if (pressedEnter == 1 && 
+						 mouseY >= 35*15+8 + OFFSET && 
+						 mouseY <= 35*15+48 + OFFSET && 
+						 mouseX >= 10 && 
+						 mouseX <= 59) {					
 					
 					pressSubmitButton();
 				}
@@ -1458,9 +1472,15 @@
 			} // What the heck is this closing? Swap mode?
 			else if(swappingTiles == 1 && gameMode == 1 && readingText == 0)
 			{
-				if(pressedSwapCancel == 1 && mouseY <= (35*15)-9 + OFFSET && mouseX >= 408 && mouseX <= 458 && mouseY >=(35*15)-49 + OFFSET)
-				{
+				// The player has hit the cancel button (unclick).
+				if (pressedSwapCancel == 1 && 
+					mouseY <= (35*15)-9 + OFFSET && 
+					mouseY >=(35*15)-49 + OFFSET &&
+					mouseX >= 408 && 
+					mouseX <= 457) {
+						
 					trace("Cancelling Swap");
+					
 					//Check to see if anything is the the swap tileset
 					for(i = 0; i < 7; i++)
 					{
@@ -1512,7 +1532,12 @@
 					swappingTiles = 0;
 				}
 				
-				else if(pressedSwapEnter == 1 &&  mouseY <= (35*15)-9 + OFFSET && mouseX >= 68 && mouseX <= 117 && mouseY >=(35*15)-49 + OFFSET)
+				// The player has hit the submit button (unclick).
+				else if (pressedSwapEnter == 1 &&  
+						 mouseY <= (35*15)-9 + OFFSET && 
+						 mouseY >=(35*15)-49 + OFFSET &&
+						 mouseX >= 68 && 
+						 mouseX <= 117)
 				{
 					for(i = 0; i < 7; i++)
 					{
