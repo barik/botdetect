@@ -9,7 +9,21 @@
 
 \begin{document}
 
-\title{An Irrational Agent Approach to Thwarting Existing Bot Detection Schemes in Social Games}
+% Problem of bot detection
+% increasing in popularity
+% Existing techniques 
+% Hypothesize pixel leel creating detecting and evasive
+% user study, click/input traces of clicks
+% data insight into bot creation/evasion
+%
+%
+% Conclusions:
+%  armms/race another race leap frog
+%  discentive of bots thorugh game mechanics
+%  
+% 
+
+\title{A Spatial Approach to the Bot Arms Race in Social Games}
 
 \numberofauthors{4}
 
@@ -82,15 +96,14 @@ Bots are a huge problem in online games. Current bot detection approaches they a
 
 \section{Introduction}
 
-Cheating is not a new concept in online games.~\cite{classification} In fact, it's been around ever since what is arguably the first commercial multi-player game published in 1986, Lucasfilms' Habitat for the Commodore 64. In Habitat, players disassembled the binary code to discover client-side only checks, thereby gaining an unfair advantage over other players in the game.~\cite{habitat}
+While cheating is not a new concept in online games, the proliferation of bots, or automated player agents that perform actions without any human intervention, has become a cause for concern for game manufacturers. Existing approaches to bot detection struggle with a perpetual arms race, since whatever means are devised to detect bots can just as easiliy be used to evade bot detection once the approach is discovered by the bot author. We hypothesis that using pixel-level interactions in conjunction with a specific game interface leads to we we have termed an unique spatiotemporal signature. [We don't have a spatiotemporal signature at the moment, though -- oops. Need to think of how to reword this hypothesis. My original hypothesis was that mimicking attacks are much more tractable in the domain of social games because of their unique characteristics.]
 
-Since then, many aspects in the landscape of online multi-player games have changed drastically, though their fundamentals principles have remained much the same. What is different today is that we are now witnessing an unprecedented level of cheating in online games through the use of bots, or automated player agents, that perform actions in the game without any human intervention whatsoever. One can speculate on the endless multitude of reasons for this proliferation: the porous boundaries between virtual and physical economics~\cite{preventbotitem}, the technical challenges of bot creation for their authors, the false premise under which players actually play (``the mangle of play'')~\cite{mangle}, or even the virtual Skinnerian game mechanics that are critically described by Jonathan Blow, creator of \textit{Braid}, as ``a form of [player] exploitation''~\cite{skinner}.
+To evaluate this hypothesis, we performed a user study in which we deloyed a word game that is representative in both the style and mechanics of social games that being commercial deployed today. The results of this study provide insight into the difficulties of bot detection using mouse positioning in the social game space.
 
-Regardless of the underlying causes, it is clear that game manufacturers want to eliminate the use of bots in their online environments by using bot detection algorithms that accurately classify human players from bots.
+Currently, the most promising techniques in bot detection fall into the category of either human interactive or observational proofs. These proofs classify players as either bots or humans by targetting some of the fundamental differences between bots and human players. Interactive mechanisms, for instance, rely on explicit Turing tests (such as CAPTHAs), while observational mechanisms rely on a bot's patterned behavior or some other deterministic characteristic that is impossible to generate by human players, due to the inherent mental and physical limitations in humans.~\cite{preventbotitem} So far, these approaches have been effective in certain classes of games, including first-person shooters (FPS), as well as many dynamic and sufficiently rich massively-multiplayer online game (MMOG) environments. [This paragraph is way too bulky for an introduction -- really just want to say HIP vs. HOP and that HOP is more effective more games, and work pretty well for complex MMO games].
 
-Currently, the most promising techniques in bot detection fall into the category of either human interactive or observational proofs. These proofs classify players as either bots or humans by targetting some of the fundamental differences between bots and human players. Interactive mechanisms, for instance, rely on explicit Turing tests (such as CAPTHAs), while observational mechanisms rely on a bot's patterned behavior or some other deterministic characteristic that is impossible to generate by human players, due to the inherent mental and physical limitations in humans.~\cite{preventbotitem} So far, these approaches have been effective in certain classes of games, including first-person shooters (FPS), as well as many dynamic and sufficiently rich massively-multiplayer online game (MMOG) environments.
+Consequently, we instead focus on the emerging problem space of social games. We define a social game as an entirely Web-based game that is deployed within a social network. These environments present unique challenges for bot detection that are found in general MMOGs. First, social games run within a sandboxed Web-browser environment, limiting their ability to collect data about the machine on which they are running. Second, the game mechanisms of social games offer a different, though overlapping, set of incentives for the creation of bots. [What can I do with this? Efficiency is irrelevent for social games. The style of bots will be different.] Finally, because social games are generally more simplistic in both interaction style and graphical complexity, we believe that the effective approaches to bot detection in the MMOG problem space became tractical from bot authors in the social games space.
 
-Yet, these existing approaches conveniently assume that mimicking attacks, that is, bots that play like humans for purposes of evading bot detection, will continue to be difficult to implement and execute in practice. To our knowledge, this assumption has not actually been experimentally verified either qualitatively or quantitatively in this problem domain.
 
 \begin{figure}
 \centering
@@ -98,9 +111,7 @@ Yet, these existing approaches conveniently assume that mimicking attacks, that 
 \caption{Our Flash implementation of Scrabblesque, a variation of Scrabble that mimics the Words with Friends layout.}
 \end{figure}
 
-Consequently, our contribution in this paper is that it provides experimental evidence so that we can objectively evaluate the validity of these claims, in the problem space of social Web-based games. For this reason, we have taken the atypical approach of bot detection \textit{evasion} -- from that of the attacker's perspective -- whereas existing literature in the field takes the conventional defensive position. Concretely, we have developed a bot model that plays a variation of Scrabble (Zynga's Words with Friends), in a way that is statistically accurate and indistinguishable from that of human players with respect to several facets of human interaction commonly used in bot detection. These facets include click-behavior, mouse positioning, path movement, and timing.
-
-At the very least, we hope our work in this area will initiate a contrarian line of research that serves to close the gap between human players and bots from a detection standpoint. Such a motivation may indeed seem nefarious until we consider the possibility that bot detection is in and of itself a perpetual arms race that only serves to treat the symptom of the problem, while ignoring the underlying root causes in game design that compel players to use bots in the very first place. We speculate on this idea in more detail in our discussion section.
+Our contribution in this paper is that it we provide empirical evidence that mouse positioning is normal with respect to the center of the button, which has previously only been tested in carefully controlled environments. We also demonstrate that the creation of bots that mimic humans, with respect to mouse positioning, is in fact a tractable problem for bot authors. As a result, social games will require novel approaches outside of those used in MMOGs to successfully detect bots and disincentivize their usage.
 
 \section{Related Work}
 
@@ -115,6 +126,8 @@ Efforts have been proposed to minimize the disruption of a player's game experie
 Presently, we are therefore compelled to dismiss the use of HIPs in games as impractical, and instead focus our efforts on passive, HOP approaches to bot detection through client-side and server-side mechanisms.
 
 \subsection{Client-Side Approaches}
+
+[Mostly gut this -- even if it's true, it's meaningless for social games, since they can't do anything about it]
 
 The developers of Habitat recognized that the backend ``shall not assume the validity of anything a player computer tells it'', a pragmatic piece of advice that remains useful even today.~\cite{habitat} Yet, a few of the proposed approaches bot detection continue to rely on a flawed assumption that the responses provided from a player's machine can be trusted.
 
@@ -146,15 +159,14 @@ Indeed, this rationalization becomes the subject of some scrutiny when the probl
 
 \section{Methodology}
 
-And though the literatures argues that human-like behavior is difficult to emulate, we are not aware of any research that has actually attempted to quantify this claim.
+This section describes our experimental setup. We begin by describing the system architecture, followed by our data collection and analysis procedures.
 
-In this paper, we propose to do so. Let us now contrast these MMOG environment with that social games, such as PopCap's Bejeweled or Zuma, Zynga's FarmVille or Words with Friends. In this problem space, the bots may indeed have single AI algorithms, but the players themselves are asked to perform repetitive, and dare I say, automatic actions. For example, one activity in FarmVille requires that the player click multiple times throughout a virtual field to plant corn. In Words with Friends, a variation of Scrabble, the number of actions themselves are constrained due to the nature of the game.
+[Need help with this].
 
-This section describes our experimental setup. We begin by describing a system architecture, and our data collection and analysis procedures.
+We created a Flash-based game that is a variation of the popular game, Scrabble. Flash and Java are popular platforms for social game design. We also wanted to design a game that is respresentative of that of existing social games, so that our results could directly be applied to commercial games rather than academic lab environments. Finally, Flash is ubiqutous and well-supported, plus it can be deployed online.
 
-Are we missing a section here? I feel like we are.
+We leveraged social networks by posting our research to various social networks and online communities. We used snowball sampling by relying on the sharing features of social networks in order to collect locate participants who were willing to play the game. We collected 423 game sessions. We cannot identify specifically how many players played the game, since a person who played at the game more than once at two different time periods would be treated as a different game session.
 
-\begin{comment}
 
 \subsection{System Architecture}
 
@@ -166,6 +178,8 @@ We therefore created a Flash-based game, a variant of Scrabble which we internal
 
 Since the focus is on player data collection, the artificial of the game itself was quite simple. The opponent did not itself have a rack; it simply used a dictionary along with the currently unallocated tiles to determine a word position. Despite the fact that the opponent did not have an optimal word selection, it routinely beat human opponents because of its fully-observable dictionary.
 
+\begin{comment}
+
 \subsection{Deployment}
 
 This section describes our experimental setup. The game Scrabbleque was placed on our online server. Participants were recruited through different online forums and social networks, such as Facebook and Twitter.
@@ -174,7 +188,7 @@ This section describes our experimental setup. The game Scrabbleque was placed o
 
 We developed a deterministic bot to evaluate our agent. The deterministic bot simply clicks in the exact center of each tile. This is representative of the simpler tools use for bot creation, such as AutoIT.
 
-We also used rudimentary path information. Though we did not actually check the trajectory of the paths themselves, we did check for the existance of a path.
+We also used rudimentary path information. Though we did not actually check the trajectory of the paths themselves, we did check for the existence of a path.
 
 \section{Results}
 
@@ -193,6 +207,8 @@ Mouse paths were much more difficult to characterize. But they are summarized in
 Our version of Scrabblesque does not have require any keyboard input; it relies solely on mouse actions to perform all functions within the game. Unfortuunately, one might expect that there are differences between input devices. For instance, a traditional desktop optimal mouse would have different motion paths than that of a touchpad, trackball, or a red-dot on IBM keywords. A small percentage of users may even be touch-screen enabled, in which case they will have no path at all.
 
 Because our Flash game does not have the capability to examine the actual hardware, we instead used unsupersived learning to classify the different behaviors of the player data. It was interesting. Here's what we found.
+
+[AIC, log log-likelihood]
 
 \subsection{Games as Research}
 
