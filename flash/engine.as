@@ -56,7 +56,7 @@
 		public var dataArray:Array = [];
 		
 		// Increment this with new builds to avoid confusion between new and cached copies.
-		public static const VERSION:String = "1.13";
+		public static const VERSION:String = "1.14";
 		
 		// The number of points needed to win the game.
 		// TODO: Computer does not win on correct turn. Example: Set points to 3.
@@ -282,7 +282,7 @@
 		public function onFrameEnter(e:Event=null):void
 		{
 						
-			if (frameCount % 6 == 0) {
+			// if (frameCount % 6 == 0) {
 				
 				if (dataArray.length > 0) {
 				
@@ -299,7 +299,7 @@
 					}					
 				}
 								
-			}
+			// }
 			
 			for (var i:int = numChildren-1; i >= 0; i--) {
 				if (getChildAt(i) is letters) {
@@ -824,6 +824,7 @@
 										
 					else
 					{
+						// Bottom rack tiles.
 						for (var i = 0; i < 7; i++)
 						{
 							if (mouseX >= 38*i+130 && mouseX <= 38*(i+1)+130)
@@ -935,6 +936,8 @@
 				else if(mouseY >= (35*15)-46 + OFFSET && mouseY <= 35*15 - 9 + OFFSET)
 				{
 					index = -1;
+					
+					// Swap tiles.
 					for(i = 0; i < 7; i++)
 					{
 						if(mouseX >= 38*i+130 && mouseX <= 38*(i+1)+130)
@@ -1215,7 +1218,7 @@
 		}
 
 		function onUnclick(eventObject:MouseEvent) {
-			
+						
 			dataArray.push("Mouse_Unclick," + mouseX + "," +mouseY + "," +getTimer());
 			
 			if(swappingTiles != 1 && gameMode == 1 && readingText == 0) {
