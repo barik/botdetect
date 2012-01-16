@@ -8,10 +8,24 @@
 	</head>
 <body>
 
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
 <?php
 ?>
 
-<h1>How do people play games?</h1>
+<h1>How do people play games? (Updated!)</h1>
+
+<div class="fb-like" data-href="http://ciigar.csc.ncsu.edu/tbarik/wwf/" data-send="true" data-width="450" data-show-faces="false"></div>
+<a href="https://twitter.com/share" class="twitter-share-button" data-text="Everyone likes Scrabble, right? Help improve believable AI by playing a quick game!" data-count="horizontal">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
+
+<p><b>Updated: January 16, 2012</b>. Based on your player traces, we obtained a lot of interesting data. As a result, we have made some further improvements to the data collection process for the game. Can you help us once more by playing a few games of Scrabble?</p>
 
 <p>We are researchers at <a href="http://www.ncsu.edu">North Carolina State 
 University</a>. Help participate in research by spending a few minutes or more 
@@ -67,6 +81,11 @@ Consequently, <strong>you must be 18 or older and be willing to allow us to
 gather data on your in-game actions to play this game.</strong> If you agree 
 to the conditions, you may begin playing the game right away!</p>
 
+<p>Even if you don't have a lot of time to play, simply clicking the Like
+	button and sharing the page on Facebook with others will allow us 
+	to more quickly collect the critical data that we need.
+</p>
+
 <p> If you have any questions about the study, please feel free to contact the 
 principal investigators, <a href="mailto:tbarik@ncsu.edu">Titus Barik</a>, or 
 <a href="mailto:beharri5@ncsu.edu">Brent Harrison</a>. Titus can also be 
@@ -75,6 +94,6 @@ reached using Google Talk at the same address.</p>
 <hr />
 
 <p>
-<img src="CIIGARLABcoloronwhite.gif"  style="width:150px"
+<img src="CIIGARLABcoloronwhite.gif"  style="width:200px"
 	alt="NC State University: Department of Computer Science" />
 </p>
